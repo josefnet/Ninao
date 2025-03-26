@@ -92,6 +92,10 @@ dependencies {
     // Serialization
     implementation(libs.serialization.json)
 
+    // Auth Google & Facebook
+    implementation(libs.play.services.auth)
+    implementation(libs.facebook.login)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
