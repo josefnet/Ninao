@@ -1,4 +1,4 @@
-package com.costostudio.ninao.ui.theme
+package com.costostudio.ninao.presentation.ui.theme
 
 import android.app.Activity
 import android.os.Build

@@ -1,4 +1,4 @@
-package com.costostudio.ninao.ui.theme
+package com.costostudio.ninao.presentation.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
