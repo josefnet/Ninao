@@ -155,16 +155,31 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel /*
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = { viewModel.register(firstName, email, password) }) {
+        Button(onClick = { viewModel.register(firstName, lastName, email, password) }) {
             Text("S'inscrire")
         }
 
-        if (registerState == true) {
-            // Redirection après inscription réussie
+        registerState?.let { result ->
+            result.onFailure { error ->
+                Text(
+                    text = error.localizedMessage ?: "Erreur inconnue",
+                    color = androidx.compose.ui.graphics.Color.Red
+                )
+            }
+        }
+
+        if (registerState?.isSuccess == true) {
             LaunchedEffect(Unit) {
                 navController.popBackStack()
             }
         }
+
+       /* if (registerState == true) {
+            // Redirection après inscription réussie
+            LaunchedEffect(Unit) {
+                navController.popBackStack()
+            }
+        }*/
 
         Spacer(modifier = Modifier.height(8.dp))
 

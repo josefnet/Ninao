@@ -99,8 +99,11 @@ dependencies {
     implementation(libs.facebook.login)
 
     // Firebase
-    implementation(libs.firebase.bom)
+    implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore.ktx)
 
     //Icons
     implementation(libs.androidx.material.icons.extended)
