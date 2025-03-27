@@ -30,19 +30,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.costostudio.ninao.R
 import com.costostudio.ninao.presentation.viewmodel.LoginViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
+fun LoginScreen(
+    onNavigateToHome: () -> Unit,
+    onNavigateToRegister: () -> Unit
+) {
+    val viewModel: LoginViewModel = koinViewModel()
     val loginState by viewModel.loginState.collectAsState()
 
     var email by remember { mutableStateOf("") }
@@ -117,8 +120,7 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
             when (loginState) {
                 is LoginViewModel.LoginState.Success -> {
                     LaunchedEffect(Unit) {
-                        // Rediriger vers l'écran principal ou autre après connexion réussie
-                        navController.navigate("home_screen")
+                        onNavigateToHome()
                     }
                 }
 
@@ -134,16 +136,21 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            TextButton(onClick = { navController.navigate("register_screen") }) {
+            TextButton(onClick = {
+                onNavigateToRegister()
+            }) {
                 Text("Pas encore de compte ? Créer un compte")
             }
         }
     }
 }
 
-@Preview
+
+@Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen(navController = NavController(LocalContext.current), viewModel = LoginViewModel())
+    LoginScreen(
+        onNavigateToHome = {},
+        onNavigateToRegister = {}
+    )
 }
-

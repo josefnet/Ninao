@@ -91,6 +91,10 @@ dependencies {
     implementation(libs.room.ktx)
     ksp(libs.room.ksp)
 
+    // Moshi JSON Parsing
+    implementation(libs.moshi)
+    ksp(libs.moshi.kotlin.codegen)
+
     // Serialization
     implementation(libs.serialization.json)
 
@@ -105,8 +109,18 @@ dependencies {
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.firestore.ktx)
 
+    //services google
+    implementation(libs.play.services.measurement.api)
+    implementation(libs.play.services.measurement.impl)
+
     //Icons
     implementation(libs.androidx.material.icons.extended)
+
+    // Accompanist (for previews, theming, animations)
+    implementation(libs.accompanist.systemuicontroller)
+
+// Coil (for image loading in Compose)
+    implementation(libs.coil.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

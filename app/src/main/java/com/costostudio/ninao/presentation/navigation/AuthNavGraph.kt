@@ -18,16 +18,22 @@ fun AuthNavGraph() {
 
     NavHost(navController = navController, startDestination = "login_screen") {
         composable("login_screen") {
-            val viewModel: LoginViewModel = koinViewModel()
-            LoginScreen(navController, viewModel)
+            /*val viewModel: LoginViewModel = koinViewModel()
+            LoginScreen(navController, viewModel)*/
+            LoginScreen(
+                onNavigateToHome = { navController.navigate("home_screen") },
+                onNavigateToRegister = { navController.navigate("register_screen") }
+            )
         }
         composable("register_screen") {
-            val viewModel: RegisterViewModel = koinViewModel()
-            RegisterScreen(navController,viewModel)
+            RegisterScreen(
+                onNavigateToLogin = { navController.navigate("login_screen") })
         }
         composable("home_screen") {
-            val viewModel: HomeViewModel = koinViewModel()
-            HomeScreen(navController, viewModel)
+
+            HomeScreen(
+                onNavigateToLogin = { navController.navigate("login_screen") }
+            )
         }
     }
 }
