@@ -29,23 +29,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import com.costostudio.ninao.R
 import com.costostudio.ninao.presentation.viewmodel.RegisterViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel /*= get()*/) {
+fun RegisterScreen(
+    onNavigateToLogin: () -> Unit
+) {
+    val viewModel: RegisterViewModel = koinViewModel()
     val registerState by viewModel.registerState.collectAsState()
 
     Box(
@@ -123,7 +125,8 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel /*
                         contentDescription = "First name"
                     )
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -147,8 +150,8 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel /*
                         )
                     }
                 },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -156,7 +159,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel /*
             OutlinedTextField(
                 value = passwordConfirmation,
                 onValueChange = { passwordConfirmation = it },
-                label = { Text("Confirmation du mot de passe") },
+                label = { Text("Confirmation mot de passe") },
                 visualTransformation = if (passwordConfirmationVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 leadingIcon = {
                     Icon(
@@ -174,13 +177,15 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel /*
                         )
                     }
                 },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(onClick = { viewModel.register(firstName, lastName, email, password) }) {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { viewModel.register(firstName, lastName, email, password) }) {
                 Text("S'inscrire")
             }
 
@@ -195,20 +200,14 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel /*
 
             if (registerState?.isSuccess == true) {
                 LaunchedEffect(Unit) {
-                    navController.popBackStack()
+                    onNavigateToLogin()
                 }
             }
 
-            /* if (registerState == true) {
-            // Redirection après inscription réussie
-            LaunchedEffect(Unit) {
-                navController.popBackStack()
-            }
-        }*/
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            TextButton(onClick = { navController.popBackStack() }) {
+            TextButton(onClick = { onNavigateToLogin() }) {
                 Text("Déjà un compte ? Se connecter")
             }
         }
@@ -219,8 +218,7 @@ fun RegisterScreen(navController: NavController, viewModel: RegisterViewModel /*
 @Composable
 fun RegisterScreenPreview() {
     RegisterScreen(
-        navController = NavController(LocalContext.current),
-        viewModel = RegisterViewModel()
+        onNavigateToLogin = {}
     )
 }
 
