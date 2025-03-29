@@ -183,7 +183,9 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Button(onClick = { viewModel.register(firstName, lastName, email, password) }) {
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { viewModel.register(firstName, lastName, email, password) }) {
                 Text("S'inscrire")
             }
 

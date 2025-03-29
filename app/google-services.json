@@ -12,7 +12,20 @@
           "package_name": "com.costostudio.ninao"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "751767083571-oj01ngont23q9ggvdnbnq02tn9delsg2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.costostudio.ninao",
+            "certificate_hash": "de07709da94c9379166cb92cef9e68dd9b613162"
+          }
+        },
+        {
+          "client_id": "751767083571-v6ps8iddq2etdcrdj5ood1ml8ipsgkjt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCY56N-P5Y5XXZXnxnJ1FrI_L_J3vsZGTw"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "751767083571-v6ps8iddq2etdcrdj5ood1ml8ipsgkjt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
