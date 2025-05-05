@@ -12,34 +12,47 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.costostudio.ninao.R
+import com.costostudio.ninao.presentation.uistate.HomeUiState
 import com.costostudio.ninao.presentation.viewmodel.HomeViewModel
-import com.google.firebase.auth.FirebaseAuth
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomeScreen(
+    onNavigateToLogin: () -> Unit,
+    viewModel: HomeViewModel
+) {
+    val state by viewModel.uiState.collectAsState()
+    HomeScreenContent(
+        state = state,
+        onLogout = viewModel::logout,
+        onNavigateToLogin = onNavigateToLogin
+    )
+}
+
+@Composable
+fun HomeScreenContent(
+    state: HomeUiState,
+    onLogout: () -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
-
-    val viewModel: HomeViewModel = koinViewModel()
-    val user = FirebaseAuth.getInstance().currentUser
-
-    if (user != null) {
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-
+    if (!state.isLoggedIn) {
+        LaunchedEffect(Unit) {
+            onNavigateToLogin()
+        }
+    } else {
+        Box(modifier = Modifier.fillMaxSize()) {
             Image(
                 painter = painterResource(id = R.drawable.bg),
                 contentDescription = null,
@@ -55,27 +68,18 @@ fun HomeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Bienvenue ${user.email}",
+                    text = "Bienvenue\n ${state.userEmail}",
                     fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Bouton de déconnexion
-                Button(
-                    onClick = {
-                        viewModel.logout()
-                        onNavigateToLogin()
-                    }
-                ) {
+                Button(onClick = onLogout) {
                     Text("Se déconnecter")
                 }
             }
-        }
-    } else {
-        LaunchedEffect(Unit) {
-            onNavigateToLogin()
         }
     }
 }
@@ -83,8 +87,14 @@ fun HomeScreen(
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(
-        onNavigateToLogin = {}
+    val fakeState = HomeUiState(
+        isLoggedIn = true,
+        userEmail = "preview@user.com"
     )
 
+    HomeScreenContent(
+        state = fakeState,
+        onLogout = {},
+        onNavigateToLogin = {}
+    )
 }

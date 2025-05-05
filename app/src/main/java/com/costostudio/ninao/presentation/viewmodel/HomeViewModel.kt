@@ -1,13 +1,28 @@
 package com.costostudio.ninao.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.google.firebase.auth.FirebaseAuth
+import com.costostudio.ninao.domain.repository.AuthRepository
+import com.costostudio.ninao.presentation.uistate.HomeUiState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
-class HomeViewModel : ViewModel() {
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+class HomeViewModel(
+    private val authRepository: AuthRepository
+) : ViewModel() {
 
-    // Fonction pour se déconnecter
+    private val _uiState = MutableStateFlow(HomeUiState())
+    val uiState: StateFlow<HomeUiState> = _uiState
+
+    init {
+        val user = authRepository.getCurrentUser()
+        _uiState.value = HomeUiState(
+            isLoggedIn = user != null,
+            userEmail = user?.email
+        )
+    }
+
     fun logout() {
-        auth.signOut()
+        authRepository.logout()
+        _uiState.value = HomeUiState(isLoggedIn = false)
     }
 }

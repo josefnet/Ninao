@@ -1,5 +1,6 @@
 package com.costostudio.ninao.presentation.screens
 
+import android.widget.Toast
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -16,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -47,124 +48,159 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.costostudio.ninao.R
-import com.costostudio.ninao.presentation.states.LoginState
+import com.costostudio.ninao.presentation.events.LoginUiEvent
+import com.costostudio.ninao.presentation.uistate.LoginUiState
 import com.costostudio.ninao.presentation.viewmodel.LoginViewModel
-import org.koin.androidx.compose.koinViewModel
+import kotlinx.coroutines.flow.collectLatest
+
 
 @Composable
 fun LoginScreen(
+    viewModel: LoginViewModel,
     onNavigateToHome: () -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
-    val viewModel: LoginViewModel = koinViewModel()
-    val loginState by viewModel.loginState.collectAsState()
+    val state by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-
-        Image(
-            painter = painterResource(id = R.drawable.bg),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.matchParentSize()
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(32.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-
-            Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = "logo",
-                modifier = Modifier.size(width = 250.dp, height = 150.dp)
-            )
-
-            Text(text = "Se connecter", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") },
-                leadingIcon = {
-                    Icon(imageVector = Icons.Default.Email, contentDescription = "Email")
-                },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Mot de passe") },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(
-                            imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (passwordVisible) "Hide password" else "Show password"
-                        )
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { viewModel.login(email, password) }) {
-                Text("Se connecter")
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            ContinueWithButton(
-                buttonText = "Continuez avec Google",
-                id = R.drawable.google_login
-            ) {
-                /* viewModel.signInWithGoogle(activity) { signInIntent ->
-                          googleSignInLauncher.launch(signInIntent) // Use the intent directly here
-                      }*/
-            }
-
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            when (loginState) {
-                is LoginState.Loading -> CircularProgressIndicator()
-                is LoginState.Success -> LaunchedEffect(Unit) { onNavigateToHome() }
-                is LoginState.Error -> Text(
-                    (loginState as LoginState.Error).message,
-                    color = Color.Red
-                )
-
-                else -> Unit
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            TextButton(onClick = {
-                onNavigateToRegister()
-            }) {
-                Text("Pas encore de compte ? Créer un compte")
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collectLatest { event ->
+            when (event) {
+                is LoginUiEvent.Success -> onNavigateToHome()
+                is LoginUiEvent.ShowError -> Toast.makeText(
+                    context,
+                    event.message,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }
+
+    LoginScreenContent(
+        state = state,
+        onLogin = { email, password -> viewModel.login(email, password) },
+        onNavigateToRegister = onNavigateToRegister
+    )
+}
+
+@Composable
+fun LoginScreenContent(
+    state: LoginUiState,
+    onLogin: (String, String) -> Unit,
+    onNavigateToRegister: () -> Unit
+) {
+
+        var email by remember { mutableStateOf("") }
+        var password by remember { mutableStateOf("") }
+        var passwordVisible by remember { mutableStateOf(false) }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+
+            Image(
+                painter = painterResource(id = R.drawable.bg),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.matchParentSize()
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(32.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = "logo",
+                    modifier = Modifier.size(width = 250.dp, height = 150.dp)
+                )
+
+                if (state.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(48.dp),
+                        color = Color.Blue,
+                        strokeWidth = 4.dp
+                    )
+                } else {
+
+
+                Text(text = "Se connecter", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text("Email") },
+                    leadingIcon = {
+                        Icon(imageVector = Icons.Default.Email, contentDescription = "Email")
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Mot de passe") },
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(
+                                imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                            )
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { onLogin(email, password) }) {
+                    Text("Se connecter")
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                ContinueWithButton(
+                    buttonText = "Continuez avec Google",
+                    id = R.drawable.google_login
+                ) {
+                    /* viewModel.signInWithGoogle(activity) { signInIntent ->
+                          googleSignInLauncher.launch(signInIntent) // Use the intent directly here
+                      }*/
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                TextButton(onClick = {
+                    onNavigateToRegister()
+                }) {
+                    Text("Pas encore de compte ? Créer un compte")
+                }
+
+
+                /* state.errorMessage?.let {
+                     Spacer(modifier = Modifier.height(16.dp))
+                     Text(it, color = MaterialTheme.colorScheme.error)
+                 }
+                 */
+
+            }
+        }
+    }
+
 }
 
 @Composable
@@ -213,8 +249,19 @@ fun ContinueWithButton(
 @Preview(showBackground = true)
 @Composable
 fun LoginScreenPreview() {
-    LoginScreen(
-        onNavigateToHome = {},
+    LoginScreenContent(
+        state = LoginUiState(),
+        onLogin = { _, _ -> },
+        onNavigateToRegister = {}
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun LoginScreenLoadingPreview() {
+    LoginScreenContent(
+        state = LoginUiState(isLoading = true),
+        onLogin = { _, _ -> },
         onNavigateToRegister = {}
     )
 }
