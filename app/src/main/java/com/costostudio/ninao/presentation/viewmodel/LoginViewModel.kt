@@ -1,30 +1,51 @@
 package com.costostudio.ninao.presentation.viewmodel
 
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.costostudio.ninao.presentation.states.LoginState
-import com.google.firebase.auth.FirebaseAuth
+import com.costostudio.ninao.domain.usecase.LoginUseCase
+import com.costostudio.ninao.presentation.events.LoginUiEvent
+import com.costostudio.ninao.presentation.uistate.LoginUiState
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
-class LoginViewModel : ViewModel() {
-    private val _loginState = MutableStateFlow<LoginState>(LoginState.Idle)
-    val loginState: StateFlow<LoginState> = _loginState
+class LoginViewModel(
+    private val loginUseCase: LoginUseCase
+) : ViewModel() {
 
-    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val _uiState = MutableStateFlow(LoginUiState())
+    val uiState: StateFlow<LoginUiState> = _uiState
+
+    private val _uiEvent = MutableSharedFlow<LoginUiEvent>()
+    val uiEvent: SharedFlow<LoginUiEvent> = _uiEvent
 
     fun login(email: String, password: String) {
-        _loginState.value = LoginState.Loading
 
+        if (!isValidInput(email, password)) {
+            _uiState.value = LoginUiState(errorMessage = "Invalid email or password")
+            return
+        }
         viewModelScope.launch {
-            try {
-                val result = auth.signInWithEmailAndPassword(email, password).await()
-                _loginState.value = LoginState.Success(result.user?.uid ?: "")
-            } catch (e: Exception) {
-                _loginState.value = LoginState.Error(e.localizedMessage ?: "Error during login")
+            _uiState.value = LoginUiState(isLoading = true)
+
+            val result = loginUseCase.execute(email, password)
+            if (result.isSuccess) {
+                _uiState.value = LoginUiState()
+                _uiEvent.emit(LoginUiEvent.Success)
+            } else {
+                val message = result.exceptionOrNull()?.message ?: "Unknown error"
+                _uiState.value = LoginUiState(errorMessage = message)
+                _uiEvent.emit(LoginUiEvent.ShowError(message))
             }
         }
     }
+
+    private fun isValidInput(email: String, password: String): Boolean {
+        return email.isNotBlank() && Patterns.EMAIL_ADDRESS.matcher(email).matches()
+                && password.length >= 6
+    }
+
 }
