@@ -10,6 +10,7 @@ import com.costostudio.ninao.presentation.screens.LoginScreen
 import com.costostudio.ninao.presentation.screens.RegisterScreen
 import com.costostudio.ninao.presentation.viewmodel.HomeViewModel
 import com.costostudio.ninao.presentation.viewmodel.LoginViewModel
+import com.costostudio.ninao.presentation.viewmodel.RegisterViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("ContextCastToActivity")
@@ -21,13 +22,15 @@ fun AuthNavGraph() {
         composable("login_screen") {
             val viewModel: LoginViewModel = koinViewModel()
             LoginScreen(
+                viewModel = viewModel,
                 onNavigateToHome = { navController.navigate("home_screen") },
                 onNavigateToRegister = { navController.navigate("register_screen") },
-                viewModel = viewModel
             )
         }
         composable("register_screen") {
+            val viewModel: RegisterViewModel = koinViewModel()
             RegisterScreen(
+                viewModel = viewModel,
                 onNavigateToLogin = { navController.navigate("login_screen") })
         }
         composable("home_screen") {
