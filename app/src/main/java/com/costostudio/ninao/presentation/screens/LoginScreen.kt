@@ -17,14 +17,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -36,17 +33,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.costostudio.ninao.R
+import com.costostudio.ninao.presentation.compose.AppLogo
 import com.costostudio.ninao.presentation.compose.BackgroundApplicationImage
+import com.costostudio.ninao.presentation.compose.CustomButton
+import com.costostudio.ninao.presentation.compose.CustomLoading
+import com.costostudio.ninao.presentation.compose.CustomTextButton
+import com.costostudio.ninao.presentation.compose.CustomTextField
 import com.costostudio.ninao.presentation.events.AuthenticationUiEvent
-import com.costostudio.ninao.presentation.uistate.BaseScreenUiState
 import com.costostudio.ninao.presentation.uistate.LoginUiState
 import com.costostudio.ninao.presentation.viewmodel.LoginViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -110,68 +110,50 @@ fun LoginScreenContent(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                Image(
-                    painter = painterResource(id = R.drawable.logo),
-                    contentDescription = "logo",
-                    modifier = Modifier.size(width = 250.dp, height = 150.dp)
+                AppLogo(
+                    backgroundImage = R.drawable.logo,
+                    modifier = Modifier.fillMaxWidth()
                 )
-
-                if (loginUiState.baseScreenUiState.isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(48.dp),
-                        color = Color.Blue,
-                        strokeWidth = 4.dp
-                    )
-                } else {
 
 
                 Text(text = "Se connecter", fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                OutlinedTextField(
+                CustomTextField(
                     value = loginUiState.email,
                     onValueChange = onEmailChanged,
-                    label = { Text("Email") },
-                    leadingIcon = {
-                        Icon(imageVector = Icons.Default.Email, contentDescription = "Email")
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    label = stringResource(R.string.registerScreen_email),
+                    leadingIcon = Icons.Default.Email,
+                    modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
 
-                OutlinedTextField(
+                CustomTextField(
                     value = loginUiState.password,
                     onValueChange = onPasswordChanged,
-                    label = { Text("Mot de passe") },
-                    visualTransformation = if (loginUiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-                        IconButton(onClick = onTogglePasswordVisibility) {
-                            Icon(
-                                imageVector = if (loginUiState.isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                contentDescription = if (loginUiState.isPasswordVisible) "Hide password" else "Show password"
-                            )
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    label = stringResource(R.string.registerScreen_password),
+                    leadingIcon = Icons.Default.Lock,
+                    trailingIcon = Icons.Default.Visibility,
+                    isPasswordField = true,
+                    isPasswordVisible = loginUiState.isPasswordVisible,
+                    onTogglePasswordVisibility = onTogglePasswordVisibility,
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick =  onLogin
-                ) {
-                    Text("Se connecter")
-                }
+
+                CustomButton(
+                    text = stringResource(R.string.loginScreen_signIn),
+                    onClick = onLogin,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 ContinueWithButton(
-                    buttonText = "Continuez avec Google",
+                    buttonText = "Continue with Google",
                     id = R.drawable.google_login
                 ) {
                     /* viewModel.signInWithGoogle(activity) { signInIntent ->
@@ -179,15 +161,15 @@ fun LoginScreenContent(
                       }*/
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                CustomTextButton(
+                    text = stringResource(R.string.loginScreen_newAccount),
+                    onClick = onNavigateToRegister,
+                    style = MaterialTheme.typography.bodyMedium
+                )
 
-                TextButton(onClick = {
-                    onNavigateToRegister()
-                }) {
-                    Text("Pas encore de compte ? Créer un compte")
+                if (loginUiState.baseScreenUiState.isLoading) {
+                    CustomLoading()
                 }
-
-            }
         }
     }
 
@@ -248,17 +230,3 @@ fun LoginScreenPreview() {
         onNavigateToRegister = {}
     )
 }
-
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenLoadingPreview() {
-    LoginScreenContent(
-        loginUiState = LoginUiState(baseScreenUiState = BaseScreenUiState(isLoading = true)),
-        onEmailChanged = {},
-        onPasswordChanged = {},
-        onTogglePasswordVisibility = {},
-        onLogin = {},
-        onNavigateToRegister = {}
-    )
-}
-

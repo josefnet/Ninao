@@ -1,13 +1,6 @@
 package com.costostudio.ninao.presentation.compose
-
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.Composable
@@ -23,12 +16,14 @@ fun CustomButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     leadingIcon: ImageVector? = null,
-    trailingIcon: ImageVector? = null
+    trailingIcon: ImageVector? = null,
+    colors: ButtonColors = ButtonDefaults.buttonColors() // ✅ Paramètre de couleur par défaut
 ) {
     Button(
         onClick = onClick,
         modifier = modifier,
-        enabled = enabled
+        enabled = enabled,
+        colors = colors // ✅ Applique les couleurs ici
     ) {
         if (leadingIcon != null) {
             Icon(
@@ -70,7 +65,11 @@ fun CustomButtonPreview() {
             text = "Connexion avec Google",
             onClick = {},
             leadingIcon = Icons.Default.AccountCircle,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary
+            )
         )
 
         Spacer(modifier = Modifier.height(12.dp))
