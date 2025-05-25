@@ -1,5 +1,6 @@
 package com.costostudio.ninao.presentation.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,9 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -38,17 +36,62 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import com.costostudio.ninao.R
+import com.costostudio.ninao.presentation.events.AuthenticationUiEvent
+import com.costostudio.ninao.presentation.uistate.RegisterUiState
 import com.costostudio.ninao.presentation.viewmodel.RegisterViewModel
-import org.koin.androidx.compose.koinViewModel
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun RegisterScreen(
+    viewModel: RegisterViewModel,
     onNavigateToLogin: () -> Unit
 ) {
-    val viewModel: RegisterViewModel = koinViewModel()
-    val registerState by viewModel.registerState.collectAsState()
+    val registerUiState by viewModel.registerUiState.collectAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.registerUiEvent.collectLatest { event ->
+            when (event) {
+                is AuthenticationUiEvent.Success -> onNavigateToLogin()
+                is AuthenticationUiEvent.ShowError -> Toast.makeText(
+                    context,
+                    event.message,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    RegisterScreenContent(
+        registerUiState = registerUiState,
+        onFirstNameChanged = viewModel::onFirstNameChanged,
+        onLastNameChanged = viewModel::onLastNameChanged,
+        onEmailChanged = viewModel::onEmailChanged,
+        onPasswordChanged = viewModel::onPasswordChanged,
+        onConfirmPasswordChanged = viewModel::onConfirmPasswordChanged,
+        onTogglePasswordVisibility = viewModel::togglePasswordVisibility,
+        onToggleConfirmPasswordVisibility = viewModel::toggleConfirmPasswordVisibility,
+        onRegister = { viewModel.register() },
+        onNavigateToLogin = onNavigateToLogin
+    )
+}
+
+@Composable
+fun RegisterScreenContent(
+    registerUiState: RegisterUiState,
+    onFirstNameChanged: (String) -> Unit,
+    onLastNameChanged: (String) -> Unit,
+    onEmailChanged: (String) -> Unit,
+    onPasswordChanged: (String) -> Unit,
+    onConfirmPasswordChanged: (String) -> Unit,
+    onTogglePasswordVisibility: () -> Unit,
+    onToggleConfirmPasswordVisibility: () -> Unit,
+    onRegister: () -> Unit,
+    onNavigateToLogin: () -> Unit
+) {
 
     Box(
         modifier = Modifier
@@ -80,16 +123,8 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            var firstName by remember { mutableStateOf("") }
-            var lastName by remember { mutableStateOf("") }
-            var email by remember { mutableStateOf("") }
-            var password by remember { mutableStateOf("") }
-            var passwordVisible by remember { mutableStateOf(false) }
-            var passwordConfirmationVisible by remember { mutableStateOf(false) }
-            var passwordConfirmation by remember { mutableStateOf("") }
-
             OutlinedTextField(
-                value = firstName, onValueChange = { firstName = it },
+                value = registerUiState.firstName, onValueChange = onFirstNameChanged,
                 label = { Text("Prénom") },
                 leadingIcon = {
                     Icon(
@@ -103,7 +138,7 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
-                value = lastName, onValueChange = { lastName = it },
+                value = registerUiState.lastName, onValueChange = onLastNameChanged,
                 label = { Text("Nom") },
                 leadingIcon = {
                     Icon(
@@ -117,7 +152,7 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
-                value = email, onValueChange = { email = it },
+                value = registerUiState.email, onValueChange = onEmailChanged,
                 label = { Text("Email") },
                 leadingIcon = {
                     Icon(
@@ -132,10 +167,10 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
+                value = registerUiState.password,
+                onValueChange = { onPasswordChanged(it) },
                 label = { Text("Mot de passe") },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (registerUiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Lock, // Lock icon before the text
@@ -143,10 +178,12 @@ fun RegisterScreen(
                     )
                 },
                 trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    IconButton(
+                        onClick =
+                            { onTogglePasswordVisibility() }) {
                         Icon(
-                            imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                            imageVector = if (registerUiState.isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = if (registerUiState.isPasswordVisible) "Hide password" else "Show password"
                         )
                     }
                 },
@@ -157,10 +194,10 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
-                value = passwordConfirmation,
-                onValueChange = { passwordConfirmation = it },
+                value = registerUiState.confirmPassword,
+                onValueChange = { onConfirmPasswordChanged(it) },
                 label = { Text("Confirmation mot de passe") },
-                visualTransformation = if (passwordConfirmationVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (registerUiState.isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Lock, // Lock icon before the text
@@ -169,11 +206,11 @@ fun RegisterScreen(
                 },
                 trailingIcon = {
                     IconButton(onClick = {
-                        passwordConfirmationVisible = !passwordConfirmationVisible
+                        onToggleConfirmPasswordVisibility()
                     }) {
                         Icon(
-                            imageVector = if (passwordConfirmationVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (passwordConfirmationVisible) "Hide password" else "Show password"
+                            imageVector = if (registerUiState.isConfirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = if (registerUiState.isConfirmPasswordVisible) "Hide password" else "Show password"
                         )
                     }
                 },
@@ -185,25 +222,10 @@ fun RegisterScreen(
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { viewModel.register(firstName, lastName, email, password) }) {
+                onClick = onRegister
+            ) {
                 Text("S'inscrire")
             }
-
-            registerState?.let { result ->
-                result.onFailure { error ->
-                    Text(
-                        text = error.localizedMessage ?: "Erreur inconnue",
-                        color = androidx.compose.ui.graphics.Color.Red
-                    )
-                }
-            }
-
-            if (registerState?.isSuccess == true) {
-                LaunchedEffect(Unit) {
-                    onNavigateToLogin()
-                }
-            }
-
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -212,13 +234,24 @@ fun RegisterScreen(
             }
         }
     }
+
 }
+
 
 @Preview
 @Composable
 fun RegisterScreenPreview() {
-    RegisterScreen(
-        onNavigateToLogin = {}
+    RegisterScreenContent(
+        registerUiState = RegisterUiState(),
+        onFirstNameChanged = { },
+        onLastNameChanged = { },
+        onEmailChanged = { },
+        onPasswordChanged = { },
+        onConfirmPasswordChanged = { },
+        onTogglePasswordVisibility = { },
+        onToggleConfirmPasswordVisibility = { },
+        onRegister = { },
+        onNavigateToLogin = { }
     )
 }
 

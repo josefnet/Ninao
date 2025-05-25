@@ -31,9 +31,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,7 +45,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.costostudio.ninao.R
-import com.costostudio.ninao.presentation.events.LoginUiEvent
+import com.costostudio.ninao.presentation.events.AuthenticationUiEvent
+import com.costostudio.ninao.presentation.uistate.BaseScreenUiState
 import com.costostudio.ninao.presentation.uistate.LoginUiState
 import com.costostudio.ninao.presentation.viewmodel.LoginViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -60,14 +58,14 @@ fun LoginScreen(
     onNavigateToHome: () -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val loginUiState by viewModel.loginUiState.collectAsState()
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.uiEvent.collectLatest { event ->
+        viewModel.loginUiEvent.collectLatest { event ->
             when (event) {
-                is LoginUiEvent.Success -> onNavigateToHome()
-                is LoginUiEvent.ShowError -> Toast.makeText(
+                is AuthenticationUiEvent.Success -> onNavigateToHome()
+                is AuthenticationUiEvent.ShowError -> Toast.makeText(
                     context,
                     event.message,
                     Toast.LENGTH_SHORT
@@ -77,22 +75,24 @@ fun LoginScreen(
     }
 
     LoginScreenContent(
-        state = state,
-        onLogin = { email, password -> viewModel.login(email, password) },
+        loginUiState = loginUiState,
+        onEmailChanged = viewModel::onEmailChanged,
+        onPasswordChanged = viewModel::onPasswordChanged,
+        onTogglePasswordVisibility = viewModel::togglePasswordVisibility,
+        onLogin = { viewModel.login() },
         onNavigateToRegister = onNavigateToRegister
     )
 }
 
 @Composable
 fun LoginScreenContent(
-    state: LoginUiState,
-    onLogin: (String, String) -> Unit,
+    loginUiState: LoginUiState,
+    onEmailChanged: (String) -> Unit,
+    onPasswordChanged: (String) -> Unit,
+    onTogglePasswordVisibility: () -> Unit,
+    onLogin: () -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
-
-        var email by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
-        var passwordVisible by remember { mutableStateOf(false) }
 
         Box(
             modifier = Modifier
@@ -120,7 +120,7 @@ fun LoginScreenContent(
                     modifier = Modifier.size(width = 250.dp, height = 150.dp)
                 )
 
-                if (state.isLoading) {
+                if (loginUiState.baseScreenUiState.isLoading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(48.dp),
                         color = Color.Blue,
@@ -134,8 +134,8 @@ fun LoginScreenContent(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
+                    value = loginUiState.email,
+                    onValueChange = onEmailChanged,
                     label = { Text("Email") },
                     leadingIcon = {
                         Icon(imageVector = Icons.Default.Email, contentDescription = "Email")
@@ -147,15 +147,15 @@ fun LoginScreenContent(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
+                    value = loginUiState.password,
+                    onValueChange = onPasswordChanged,
                     label = { Text("Mot de passe") },
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation = if (loginUiState.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        IconButton(onClick = onTogglePasswordVisibility) {
                             Icon(
-                                imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                                contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                                imageVector = if (loginUiState.isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                                contentDescription = if (loginUiState.isPasswordVisible) "Hide password" else "Show password"
                             )
                         }
                     },
@@ -167,7 +167,8 @@ fun LoginScreenContent(
 
                 Button(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { onLogin(email, password) }) {
+                    onClick =  onLogin
+                ) {
                     Text("Se connecter")
                 }
 
@@ -191,7 +192,7 @@ fun LoginScreenContent(
                 }
 
 
-                /* state.errorMessage?.let {
+                /* loginUiState.errorMessage?.let {
                      Spacer(modifier = Modifier.height(16.dp))
                      Text(it, color = MaterialTheme.colorScheme.error)
                  }
@@ -250,8 +251,11 @@ fun ContinueWithButton(
 @Composable
 fun LoginScreenPreview() {
     LoginScreenContent(
-        state = LoginUiState(),
-        onLogin = { _, _ -> },
+        loginUiState = LoginUiState(),
+        onEmailChanged = {},
+        onPasswordChanged = {},
+        onTogglePasswordVisibility = {},
+        onLogin = {},
         onNavigateToRegister = {}
     )
 }
@@ -260,8 +264,12 @@ fun LoginScreenPreview() {
 @Composable
 fun LoginScreenLoadingPreview() {
     LoginScreenContent(
-        state = LoginUiState(isLoading = true),
-        onLogin = { _, _ -> },
+        loginUiState = LoginUiState(baseScreenUiState = BaseScreenUiState(isLoading = true)),
+        onEmailChanged = {},
+        onPasswordChanged = {},
+        onTogglePasswordVisibility = {},
+        onLogin = {},
         onNavigateToRegister = {}
     )
 }
+

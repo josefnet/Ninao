@@ -6,6 +6,10 @@ import com.costostudio.ninao.domain.repository.AuthRepository
 import com.costostudio.ninao.domain.repository.UserRepository
 import com.costostudio.ninao.domain.usecase.LoginUseCase
 import com.costostudio.ninao.domain.usecase.LoginUseCaseImpl
+import com.costostudio.ninao.domain.usecase.RegisterUseCase
+import com.costostudio.ninao.domain.usecase.RegisterUseCaseImpl
+import com.costostudio.ninao.domain.usecase.SaveUserToFireStoreUseCase
+import com.costostudio.ninao.domain.usecase.SaveUserToFireStoreUseCaseImpl
 import com.costostudio.ninao.presentation.viewmodel.HomeViewModel
 import com.costostudio.ninao.presentation.viewmodel.LoginViewModel
 import com.costostudio.ninao.presentation.viewmodel.RegisterViewModel
@@ -27,8 +31,11 @@ val appModule = module {
 
     // useCases
     single<LoginUseCase> { LoginUseCaseImpl(get()) }
+    single<RegisterUseCase> { RegisterUseCaseImpl(get()) }
+    single<SaveUserToFireStoreUseCase> { SaveUserToFireStoreUseCaseImpl(get()) }
+
 
     viewModel { LoginViewModel(get()) }
-    viewModel { RegisterViewModel(get(), get()) }
+    viewModel { RegisterViewModel(get(),get())}
     viewModel { HomeViewModel(get()) }
 }
