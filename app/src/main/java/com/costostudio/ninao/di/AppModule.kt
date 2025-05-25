@@ -22,10 +22,13 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val appModule = module {
+
     single { FirebaseAuth.getInstance() }
     single { FirebaseFirestore.getInstance() }
 
     single<SignInClient> { Identity.getSignInClient(androidContext()) }
+
+    // Repositories
     single<AuthRepository> { AuthRepositoryImpl(get()) }
     single<UserRepository> { UserRepositoryImpl(get()) }
 
@@ -34,7 +37,7 @@ val appModule = module {
     single<RegisterUseCase> { RegisterUseCaseImpl(get()) }
     single<SaveUserToFireStoreUseCase> { SaveUserToFireStoreUseCaseImpl(get()) }
 
-
+    // ViewModels
     viewModel { LoginViewModel(get()) }
     viewModel { RegisterViewModel(get(),get())}
     viewModel { HomeViewModel(get()) }

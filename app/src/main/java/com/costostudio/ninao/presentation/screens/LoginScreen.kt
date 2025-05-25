@@ -34,7 +34,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.costostudio.ninao.R
+import com.costostudio.ninao.presentation.compose.BackgroundApplicationImage
 import com.costostudio.ninao.presentation.events.AuthenticationUiEvent
 import com.costostudio.ninao.presentation.uistate.BaseScreenUiState
 import com.costostudio.ninao.presentation.uistate.LoginUiState
@@ -98,13 +98,9 @@ fun LoginScreenContent(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-
-            Image(
-                painter = painterResource(id = R.drawable.bg),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.matchParentSize()
-            )
+            BackgroundApplicationImage(
+                backgroundImage = R.drawable.bg,
+                modifier = Modifier.matchParentSize())
 
             Column(
                 modifier = Modifier
@@ -190,13 +186,6 @@ fun LoginScreenContent(
                 }) {
                     Text("Pas encore de compte ? Créer un compte")
                 }
-
-
-                /* loginUiState.errorMessage?.let {
-                     Spacer(modifier = Modifier.height(16.dp))
-                     Text(it, color = MaterialTheme.colorScheme.error)
-                 }
-                 */
 
             }
         }
