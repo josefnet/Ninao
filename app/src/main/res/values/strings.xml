@@ -2,12 +2,16 @@
     <string name="app_name">Ninao</string>
 
     <string name="registerScreen_createAccount">Create an account</string>
-    <string name="registerScreen_signIn">Sign in</string>
+    <string name="registerScreen_signup">Sign up</string>
     <string name="registerScreen_haveAccount">Already have an account? Log in</string>
     <string name="registerScreen_firstname">First name</string>
     <string name="registerScreen_lastname">Last name</string>
     <string name="registerScreen_email">Email</string>
     <string name="registerScreen_password">Password</string>
     <string name="registerScreen_confirmPassword">Confirm password</string>
+
+    <string name="loginScreen_signIn">Sign in</string>
+    <string name="loginScreen_newAccount">Don\'t have an account yet? Create one</string>
+
 
 </resources>

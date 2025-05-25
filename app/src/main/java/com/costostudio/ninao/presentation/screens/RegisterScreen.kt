@@ -1,7 +1,6 @@
 package com.costostudio.ninao.presentation.screens
 
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Abc
 import androidx.compose.material.icons.filled.Email
@@ -28,11 +26,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.costostudio.ninao.R
+import com.costostudio.ninao.presentation.compose.AppLogo
+import com.costostudio.ninao.presentation.compose.BackgroundApplicationImage
 import com.costostudio.ninao.presentation.compose.CustomButton
 import com.costostudio.ninao.presentation.compose.CustomLoading
 import com.costostudio.ninao.presentation.compose.CustomTextButton
@@ -92,10 +90,8 @@ fun RegisterScreenContent(
         modifier = Modifier.fillMaxSize()
     ) {
 
-        Image(
-            painter = painterResource(id = R.drawable.bg),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
+        BackgroundApplicationImage(
+            backgroundImage = R.drawable.bg,
             modifier = Modifier.matchParentSize()
         )
 
@@ -107,10 +103,9 @@ fun RegisterScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Image(
-                painter = painterResource(id = R.drawable.logo),
-                contentDescription = null,
-                modifier = Modifier.size(width = 250.dp, height = 150.dp)
+            AppLogo(
+                backgroundImage = R.drawable.logo,
+                modifier = Modifier.fillMaxWidth()
             )
 
             Text(
@@ -155,7 +150,6 @@ fun RegisterScreenContent(
                 isPasswordVisible = registerUiState.isPasswordVisible,
                 onTogglePasswordVisibility = onTogglePasswordVisibility,
                 modifier = Modifier.fillMaxWidth()
-
             )
 
             CustomTextField(
@@ -174,7 +168,7 @@ fun RegisterScreenContent(
             Spacer(modifier = Modifier.height(16.dp))
 
             CustomButton(
-                text = stringResource(R.string.registerScreen_signIn),
+                text = stringResource(R.string.registerScreen_signup),
                 onClick = onRegister,
                 modifier = Modifier.fillMaxWidth()
             )
