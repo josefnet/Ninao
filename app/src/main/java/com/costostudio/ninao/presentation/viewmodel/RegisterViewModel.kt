@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.costostudio.ninao.domain.usecase.RegisterUseCase
 import com.costostudio.ninao.domain.usecase.SaveUserToFireStoreUseCase
 import com.costostudio.ninao.presentation.events.AuthenticationUiEvent
+import com.costostudio.ninao.presentation.events.RegisterEvent
 import com.costostudio.ninao.presentation.uistate.RegisterUiState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +26,44 @@ class RegisterViewModel(
     private val _registerUiEvent = MutableSharedFlow<AuthenticationUiEvent>()
     val registerUiEvent: SharedFlow<AuthenticationUiEvent> = _registerUiEvent
 
+    fun onEvent(event: RegisterEvent) {
+        when (event) {
+            is RegisterEvent.FirstNameChanged -> {
+                _registerUiState.update { it.copy(firstName = event.firstName) }
+            }
+
+            is RegisterEvent.LastNameChanged -> {
+                _registerUiState.update { it.copy(lastName = event.lastName) }
+            }
+
+            is RegisterEvent.EmailChanged -> {
+                _registerUiState.update { it.copy(email = event.email) }
+            }
+
+            is RegisterEvent.PasswordChanged -> {
+                _registerUiState.update { it.copy(password = event.password) }
+            }
+
+            is RegisterEvent.ConfirmPasswordChanged -> {
+                _registerUiState.update { it.copy(confirmPassword = event.confirmPassword) }
+            }
+
+            RegisterEvent.TogglePasswordVisibility -> {
+                _registerUiState.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
+            }
+
+            RegisterEvent.ToggleConfirmPasswordVisibility -> {
+                _registerUiState.update { it.copy(isConfirmPasswordVisible = !it.isConfirmPasswordVisible) }
+            }
+
+            RegisterEvent.Register -> {
+                register()
+            }
+
+        }
+    }
+
+
     fun register() {
 
         val firstName = _registerUiState.value.firstName
@@ -33,9 +72,9 @@ class RegisterViewModel(
         val password = _registerUiState.value.password
         val confirmPassword = _registerUiState.value.confirmPassword
 
-        viewModelScope.launch {
-        if (!isValidInput(firstName, lastName, email, password,confirmPassword)) {
-            val message = "Vérifiez les champs : email invalide, mot de passe trop court ou non identique."
+        if (!isValidInput(firstName, lastName, email, password, confirmPassword)) {
+            val message =
+                "Vérifiez les champs : email invalide, mot de passe trop court ou non identique."
             _registerUiState.update {
                 it.copy(
                     baseScreenUiState = it.baseScreenUiState.copy(
@@ -43,11 +82,10 @@ class RegisterViewModel(
                     )
                 )
             }
-            _registerUiEvent.emit(AuthenticationUiEvent.ShowError(message))
-            return@launch
+            return
         }
 
-
+        viewModelScope.launch {
 
             _registerUiState.update {
                 it.copy(
@@ -80,7 +118,8 @@ class RegisterViewModel(
                     }
                     _registerUiEvent.emit(AuthenticationUiEvent.Success)
                 } else {
-                    val message = authResult.exceptionOrNull()?.message ?: "Erreur lors de l'enregistrement dans Firestore"
+                    val message = authResult.exceptionOrNull()?.message
+                        ?: "Erreur lors de l'enregistrement dans Firestore"
                     _registerUiState.update {
                         it.copy(
                             baseScreenUiState = it.baseScreenUiState.copy(
@@ -105,34 +144,6 @@ class RegisterViewModel(
             }
 
         }
-    }
-
-    fun onFirstNameChanged(firstName: String) {
-        _registerUiState.update { it.copy(firstName = firstName) }
-    }
-
-    fun onLastNameChanged(lastName: String) {
-        _registerUiState.update { it.copy(lastName = lastName) }
-    }
-
-    fun onEmailChanged(email: String) {
-        _registerUiState.update { it.copy(email = email) }
-    }
-
-    fun onPasswordChanged(password: String) {
-        _registerUiState.update { it.copy(password = password) }
-    }
-
-    fun onConfirmPasswordChanged(confirmPassword: String) {
-        _registerUiState.update { it.copy(confirmPassword = confirmPassword) }
-    }
-
-    fun togglePasswordVisibility() {
-        _registerUiState.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
-    }
-
-    fun toggleConfirmPasswordVisibility() {
-        _registerUiState.update { it.copy(isConfirmPasswordVisible = !it.isConfirmPasswordVisible) }
     }
 
     fun isValidInput(

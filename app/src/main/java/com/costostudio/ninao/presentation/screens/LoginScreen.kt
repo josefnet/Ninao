@@ -46,6 +46,8 @@ import com.costostudio.ninao.presentation.compose.CustomLoading
 import com.costostudio.ninao.presentation.compose.CustomTextButton
 import com.costostudio.ninao.presentation.compose.CustomTextField
 import com.costostudio.ninao.presentation.events.AuthenticationUiEvent
+import com.costostudio.ninao.presentation.events.LoginEvent
+import com.costostudio.ninao.presentation.navigation.AuthNavigator
 import com.costostudio.ninao.presentation.uistate.LoginUiState
 import com.costostudio.ninao.presentation.viewmodel.LoginViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -54,8 +56,7 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
-    onNavigateToHome: () -> Unit,
-    onNavigateToRegister: () -> Unit
+    navigator: AuthNavigator
 ) {
     val loginUiState by viewModel.loginUiState.collectAsState()
     val context = LocalContext.current
@@ -63,7 +64,7 @@ fun LoginScreen(
     LaunchedEffect(Unit) {
         viewModel.loginUiEvent.collectLatest { event ->
             when (event) {
-                is AuthenticationUiEvent.Success -> onNavigateToHome()
+                is AuthenticationUiEvent.Success -> navigator.navigateToHome()
                 is AuthenticationUiEvent.ShowError -> Toast.makeText(
                     context,
                     event.message,
@@ -75,21 +76,15 @@ fun LoginScreen(
 
     LoginScreenContent(
         loginUiState = loginUiState,
-        onEmailChanged = viewModel::onEmailChanged,
-        onPasswordChanged = viewModel::onPasswordChanged,
-        onTogglePasswordVisibility = viewModel::togglePasswordVisibility,
-        onLogin = { viewModel.login() },
-        onNavigateToRegister = onNavigateToRegister
+        onEvent= viewModel::onEvent,
+        onNavigateToRegister = navigator::navigateToRegister
     )
 }
 
 @Composable
 fun LoginScreenContent(
     loginUiState: LoginUiState,
-    onEmailChanged: (String) -> Unit,
-    onPasswordChanged: (String) -> Unit,
-    onTogglePasswordVisibility: () -> Unit,
-    onLogin: () -> Unit,
+    onEvent: (LoginEvent) -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
 
@@ -121,7 +116,7 @@ fun LoginScreenContent(
 
                 CustomTextField(
                     value = loginUiState.email,
-                    onValueChange = onEmailChanged,
+                    onValueChange = { onEvent(LoginEvent.EmailChanged(it)) },
                     label = stringResource(R.string.registerScreen_email),
                     leadingIcon = Icons.Default.Email,
                     modifier = Modifier.fillMaxWidth()
@@ -130,13 +125,13 @@ fun LoginScreenContent(
 
                 CustomTextField(
                     value = loginUiState.password,
-                    onValueChange = onPasswordChanged,
+                    onValueChange = { onEvent(LoginEvent.PasswordChanged(it)) },
                     label = stringResource(R.string.registerScreen_password),
                     leadingIcon = Icons.Default.Lock,
                     trailingIcon = Icons.Default.Visibility,
                     isPasswordField = true,
                     isPasswordVisible = loginUiState.isPasswordVisible,
-                    onTogglePasswordVisibility = onTogglePasswordVisibility,
+                    onTogglePasswordVisibility = { onEvent(LoginEvent.TogglePasswordVisibility) },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -145,7 +140,7 @@ fun LoginScreenContent(
 
                 CustomButton(
                     text = stringResource(R.string.loginScreen_signIn),
-                    onClick = onLogin,
+                    onClick = { onEvent(LoginEvent.Submit) },
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -222,10 +217,7 @@ fun ContinueWithButton(
 fun LoginScreenPreview() {
     LoginScreenContent(
         loginUiState = LoginUiState(),
-        onEmailChanged = {},
-        onPasswordChanged = {},
-        onTogglePasswordVisibility = {},
-        onLogin = {},
+        onEvent = {},
         onNavigateToRegister = {}
     )
 }

@@ -24,20 +24,22 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.costostudio.ninao.R
+import com.costostudio.ninao.presentation.navigation.AuthNavigator
 import com.costostudio.ninao.presentation.uistate.HomeUiState
 import com.costostudio.ninao.presentation.viewmodel.HomeViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomeScreen(
-    onNavigateToLogin: () -> Unit,
-    viewModel: HomeViewModel
+    viewModel: HomeViewModel,
+    navigator: AuthNavigator,
+
 ) {
     val state by viewModel.uiState.collectAsState()
     HomeScreenContent(
         state = state,
         onLogout = viewModel::logout,
-        onNavigateToLogin = onNavigateToLogin
+        onNavigateToLogin = navigator::navigateToLogin
     )
 }
 

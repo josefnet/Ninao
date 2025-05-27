@@ -1,7 +1,8 @@
 package com.costostudio.ninao.presentation.navigation
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -13,32 +14,25 @@ import com.costostudio.ninao.presentation.viewmodel.LoginViewModel
 import com.costostudio.ninao.presentation.viewmodel.RegisterViewModel
 import org.koin.androidx.compose.koinViewModel
 
-@SuppressLint("ContextCastToActivity")
 @Composable
-fun AuthNavGraph() {
-    val navController = rememberNavController()
+fun AuthNavGraph(
+    navController: NavHostController = rememberNavController()
+) {
+    val navigator = remember(navController) { AuthNavigatorImpl(navController) }
 
-    NavHost(navController = navController, startDestination = "login_screen") {
-        composable("login_screen") {
+    NavHost(navController, startDestination = AppDestinations.LOGIN) {
+        composable(AppDestinations.LOGIN) {
             val viewModel: LoginViewModel = koinViewModel()
-            LoginScreen(
-                viewModel = viewModel,
-                onNavigateToHome = { navController.navigate("home_screen") },
-                onNavigateToRegister = { navController.navigate("register_screen") },
-            )
+            LoginScreen(viewModel, navigator)
         }
-        composable("register_screen") {
-            val viewModel: RegisterViewModel = koinViewModel()
-            RegisterScreen(
-                viewModel = viewModel,
-                onNavigateToLogin = { navController.navigate("login_screen") })
-        }
-        composable("home_screen") {
+        composable(AppDestinations.HOME) {
             val viewModel: HomeViewModel = koinViewModel()
-            HomeScreen(
-                onNavigateToLogin = { navController.navigate("login_screen") },
-                viewModel = viewModel
-            )
+            HomeScreen(viewModel, navigator)
         }
+        composable(AppDestinations.REGISTER) {
+            val viewModel: RegisterViewModel = koinViewModel()
+            RegisterScreen(viewModel, navigator)
+        }
+
     }
 }

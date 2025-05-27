@@ -36,13 +36,16 @@ import com.costostudio.ninao.presentation.compose.CustomLoading
 import com.costostudio.ninao.presentation.compose.CustomTextButton
 import com.costostudio.ninao.presentation.compose.CustomTextField
 import com.costostudio.ninao.presentation.events.AuthenticationUiEvent
+import com.costostudio.ninao.presentation.events.RegisterEvent
+import com.costostudio.ninao.presentation.navigation.AuthNavigator
 import com.costostudio.ninao.presentation.uistate.RegisterUiState
 import com.costostudio.ninao.presentation.viewmodel.RegisterViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun RegisterScreen(
-    viewModel: RegisterViewModel, onNavigateToLogin: () -> Unit
+    viewModel: RegisterViewModel,
+    navigator: AuthNavigator,
 ) {
     val registerUiState by viewModel.registerUiState.collectAsState()
     val context = LocalContext.current
@@ -50,7 +53,7 @@ fun RegisterScreen(
     LaunchedEffect(Unit) {
         viewModel.registerUiEvent.collectLatest { event ->
             when (event) {
-                is AuthenticationUiEvent.Success -> onNavigateToLogin()
+                is AuthenticationUiEvent.Success -> navigator.navigateToLogin()
                 is AuthenticationUiEvent.ShowError -> Toast.makeText(
                     context, event.message, Toast.LENGTH_SHORT
                 ).show()
@@ -60,29 +63,15 @@ fun RegisterScreen(
 
     RegisterScreenContent(
         registerUiState = registerUiState,
-        onFirstNameChanged = viewModel::onFirstNameChanged,
-        onLastNameChanged = viewModel::onLastNameChanged,
-        onEmailChanged = viewModel::onEmailChanged,
-        onPasswordChanged = viewModel::onPasswordChanged,
-        onConfirmPasswordChanged = viewModel::onConfirmPasswordChanged,
-        onTogglePasswordVisibility = viewModel::togglePasswordVisibility,
-        onToggleConfirmPasswordVisibility = viewModel::toggleConfirmPasswordVisibility,
-        onRegister = { viewModel.register() },
-        onNavigateToLogin = onNavigateToLogin
+        onEvent = viewModel::onEvent,
+        onNavigateToLogin = navigator::navigateToLogin
     )
 }
 
 @Composable
 fun RegisterScreenContent(
     registerUiState: RegisterUiState,
-    onFirstNameChanged: (String) -> Unit,
-    onLastNameChanged: (String) -> Unit,
-    onEmailChanged: (String) -> Unit,
-    onPasswordChanged: (String) -> Unit,
-    onConfirmPasswordChanged: (String) -> Unit,
-    onTogglePasswordVisibility: () -> Unit,
-    onToggleConfirmPasswordVisibility: () -> Unit,
-    onRegister: () -> Unit,
+    onEvent: (RegisterEvent) -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
 
@@ -118,7 +107,7 @@ fun RegisterScreenContent(
 
             CustomTextField(
                 value = registerUiState.firstName,
-                onValueChange = onFirstNameChanged,
+                onValueChange = { onEvent(RegisterEvent.FirstNameChanged(it)) },
                 label = stringResource(R.string.registerScreen_firstname),
                 leadingIcon = Icons.Default.Abc,
                 modifier = Modifier.fillMaxWidth()
@@ -126,7 +115,7 @@ fun RegisterScreenContent(
 
             CustomTextField(
                 value = registerUiState.lastName,
-                onValueChange = onLastNameChanged,
+                onValueChange = { onEvent(RegisterEvent.LastNameChanged(it)) },
                 label = stringResource(R.string.registerScreen_lastname),
                 leadingIcon = Icons.Default.Abc,
                 modifier = Modifier.fillMaxWidth()
@@ -134,7 +123,7 @@ fun RegisterScreenContent(
 
             CustomTextField(
                 value = registerUiState.email,
-                onValueChange = onEmailChanged,
+                onValueChange = { onEvent(RegisterEvent.EmailChanged(it)) },
                 label = stringResource(R.string.registerScreen_email),
                 leadingIcon = Icons.Default.Email,
                 modifier = Modifier.fillMaxWidth()
@@ -142,25 +131,25 @@ fun RegisterScreenContent(
 
             CustomTextField(
                 value = registerUiState.password,
-                onValueChange = onPasswordChanged,
+                onValueChange = { onEvent(RegisterEvent.PasswordChanged(it)) },
                 label = stringResource(R.string.registerScreen_password),
                 leadingIcon = Icons.Default.Lock,
                 trailingIcon = Icons.Default.Visibility,
                 isPasswordField = true,
                 isPasswordVisible = registerUiState.isPasswordVisible,
-                onTogglePasswordVisibility = onTogglePasswordVisibility,
+                onTogglePasswordVisibility = { onEvent(RegisterEvent.TogglePasswordVisibility) },
                 modifier = Modifier.fillMaxWidth()
             )
 
             CustomTextField(
                 value = registerUiState.confirmPassword,
-                onValueChange = onConfirmPasswordChanged,
+                onValueChange = { onEvent(RegisterEvent.ConfirmPasswordChanged(it)) },
                 label = stringResource(R.string.registerScreen_confirmPassword),
                 leadingIcon = Icons.Default.Lock,
                 trailingIcon = Icons.Default.Visibility,
                 isPasswordField = true,
                 isPasswordVisible = registerUiState.isConfirmPasswordVisible,
-                onTogglePasswordVisibility = onToggleConfirmPasswordVisibility,
+                onTogglePasswordVisibility = { onEvent(RegisterEvent.ToggleConfirmPasswordVisibility) },
                 modifier = Modifier.fillMaxWidth()
 
             )
@@ -169,11 +158,11 @@ fun RegisterScreenContent(
 
             CustomButton(
                 text = stringResource(R.string.registerScreen_signup),
-                onClick = onRegister,
+                onClick = { onEvent(RegisterEvent.Register) },
                 modifier = Modifier.fillMaxWidth()
             )
 
-           CustomTextButton(
+            CustomTextButton(
                 text = stringResource(R.string.registerScreen_haveAccount),
                 onClick = onNavigateToLogin,
                 style = MaterialTheme.typography.bodyMedium
@@ -194,14 +183,7 @@ fun RegisterScreenContent(
 fun RegisterScreenPreview() {
     RegisterScreenContent(
         registerUiState = RegisterUiState(),
-        onFirstNameChanged = { },
-        onLastNameChanged = { },
-        onEmailChanged = { },
-        onPasswordChanged = { },
-        onConfirmPasswordChanged = { },
-        onTogglePasswordVisibility = { },
-        onToggleConfirmPasswordVisibility = { },
-        onRegister = { },
+        onEvent = {},
         onNavigateToLogin = { })
 }
 
