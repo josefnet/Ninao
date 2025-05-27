@@ -110,7 +110,7 @@ fun LoginScreenContent(
                 )
 
 
-                Text(text = "Se connecter", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text(text = stringResource(R.string.loginScreen_login_message), fontSize = 24.sp, fontWeight = FontWeight.Bold)
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -147,7 +147,7 @@ fun LoginScreenContent(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 ContinueWithButton(
-                    buttonText = "Continue with Google",
+                    buttonText = stringResource(R.string.loginScreen_signInWithGoogle),
                     id = R.drawable.google_login
                 ) {
                     /* viewModel.signInWithGoogle(activity) { signInIntent ->

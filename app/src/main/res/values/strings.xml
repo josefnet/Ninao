@@ -12,6 +12,11 @@
 
     <string name="loginScreen_signIn">Sign in</string>
     <string name="loginScreen_newAccount">Don\'t have an account yet? Create one</string>
+    <string name="loginScreen_forgotPassword">Forgot password?</string>
+    <string name="loginScreen_signInWithGoogle">Sign in with Google</string>
+    <string name="loginScreen_login_message">Log in</string>
+
+    <string name="homeScreen_logout">Logout</string>
 
 
 </resources>
