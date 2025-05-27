@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.costostudio.ninao.domain.usecase.LoginUseCase
 import com.costostudio.ninao.presentation.events.AuthenticationUiEvent
+import com.costostudio.ninao.presentation.events.LoginEvent
 import com.costostudio.ninao.presentation.uistate.LoginUiState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +24,25 @@ class LoginViewModel(
     private val _loginUiEvent = MutableSharedFlow<AuthenticationUiEvent>()
     val loginUiEvent: SharedFlow<AuthenticationUiEvent> = _loginUiEvent
 
+    fun onEvent(event: LoginEvent) {
+        when (event) {
+            is LoginEvent.EmailChanged -> {
+                _loginUiState.update { it.copy(email = event.email) }
+            }
+
+            is LoginEvent.PasswordChanged -> {
+                _loginUiState.update { it.copy(password = event.password) }
+            }
+
+            LoginEvent.TogglePasswordVisibility -> {
+                _loginUiState.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
+            }
+
+            LoginEvent.Submit -> {
+                login()
+            }
+        }
+    }
 
     fun login() {
 
@@ -71,18 +91,6 @@ class LoginViewModel(
                 _loginUiEvent.emit(AuthenticationUiEvent.ShowError(message))
             }
         }
-    }
-
-    fun onEmailChanged(email: String) {
-        _loginUiState.update { it.copy(email = email) }
-    }
-
-    fun onPasswordChanged(password: String) {
-        _loginUiState.update { it.copy(password = password) }
-    }
-
-    fun togglePasswordVisibility() {
-        _loginUiState.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
     }
 
     private fun isValidInput(email: String, password: String): Boolean {
