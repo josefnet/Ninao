@@ -1,4 +1,4 @@
-package com.costostudio.ninao.presentation.screens
+package com.costostudio.ninao.presentation.login
 
 import android.widget.Toast
 import androidx.annotation.DrawableRes
@@ -39,17 +39,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.costostudio.ninao.R
-import com.costostudio.ninao.presentation.compose.AppLogo
-import com.costostudio.ninao.presentation.compose.BackgroundApplicationImage
-import com.costostudio.ninao.presentation.compose.CustomButton
-import com.costostudio.ninao.presentation.compose.CustomLoading
-import com.costostudio.ninao.presentation.compose.CustomTextButton
-import com.costostudio.ninao.presentation.compose.CustomTextField
-import com.costostudio.ninao.presentation.events.AuthenticationUiEvent
-import com.costostudio.ninao.presentation.events.LoginEvent
+import com.costostudio.ninao.presentation.util.compose.AppLogo
+import com.costostudio.ninao.presentation.util.compose.BackgroundApplicationImage
+import com.costostudio.ninao.presentation.util.compose.CustomButton
+import com.costostudio.ninao.presentation.util.compose.CustomLoading
+import com.costostudio.ninao.presentation.util.compose.CustomTextButton
+import com.costostudio.ninao.presentation.util.compose.CustomTextField
+import com.costostudio.ninao.presentation.util.events.AuthenticationUiEvent
 import com.costostudio.ninao.presentation.navigation.AuthNavigator
-import com.costostudio.ninao.presentation.uistate.LoginUiState
-import com.costostudio.ninao.presentation.viewmodel.LoginViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 

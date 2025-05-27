@@ -1,4 +1,4 @@
-package com.costostudio.ninao.presentation.uistate
+package com.costostudio.ninao.presentation.home
 
 data class HomeUiState(
     val isLoggedIn: Boolean = false,

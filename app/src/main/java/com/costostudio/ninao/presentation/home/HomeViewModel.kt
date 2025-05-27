@@ -1,8 +1,7 @@
-package com.costostudio.ninao.presentation.viewmodel
+package com.costostudio.ninao.presentation.home
 
 import androidx.lifecycle.ViewModel
 import com.costostudio.ninao.domain.repository.AuthRepository
-import com.costostudio.ninao.presentation.uistate.HomeUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 

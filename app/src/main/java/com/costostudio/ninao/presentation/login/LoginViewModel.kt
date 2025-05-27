@@ -1,12 +1,10 @@
-package com.costostudio.ninao.presentation.viewmodel
+package com.costostudio.ninao.presentation.login
 
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.costostudio.ninao.domain.usecase.LoginUseCase
-import com.costostudio.ninao.presentation.events.AuthenticationUiEvent
-import com.costostudio.ninao.presentation.events.LoginEvent
-import com.costostudio.ninao.presentation.uistate.LoginUiState
+import com.costostudio.ninao.presentation.util.events.AuthenticationUiEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow

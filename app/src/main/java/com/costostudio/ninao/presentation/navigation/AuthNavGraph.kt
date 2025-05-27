@@ -6,12 +6,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.costostudio.ninao.presentation.screens.HomeScreen
-import com.costostudio.ninao.presentation.screens.LoginScreen
-import com.costostudio.ninao.presentation.screens.RegisterScreen
-import com.costostudio.ninao.presentation.viewmodel.HomeViewModel
-import com.costostudio.ninao.presentation.viewmodel.LoginViewModel
-import com.costostudio.ninao.presentation.viewmodel.RegisterViewModel
+import com.costostudio.ninao.presentation.home.HomeScreen
+import com.costostudio.ninao.presentation.login.LoginScreen
+import com.costostudio.ninao.presentation.register.RegisterScreen
+import com.costostudio.ninao.presentation.home.HomeViewModel
+import com.costostudio.ninao.presentation.login.LoginViewModel
+import com.costostudio.ninao.presentation.register.RegisterViewModel
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

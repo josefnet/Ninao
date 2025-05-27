@@ -1,4 +1,4 @@
-package com.costostudio.ninao.presentation.uistate
+package com.costostudio.ninao.presentation.util.uistate
 
 data class BaseScreenUiState(
     val isLoading: Boolean = false,

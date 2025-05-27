@@ -1,4 +1,4 @@
-package com.costostudio.ninao.presentation.compose
+package com.costostudio.ninao.presentation.util.compose
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image

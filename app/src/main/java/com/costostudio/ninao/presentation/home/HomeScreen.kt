@@ -1,4 +1,4 @@
-package com.costostudio.ninao.presentation.screens
+package com.costostudio.ninao.presentation.home
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -26,8 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.costostudio.ninao.R
 import com.costostudio.ninao.presentation.navigation.AuthNavigator
-import com.costostudio.ninao.presentation.uistate.HomeUiState
-import com.costostudio.ninao.presentation.viewmodel.HomeViewModel
+import com.costostudio.ninao.presentation.home.HomeUiState
+import com.costostudio.ninao.presentation.home.HomeViewModel
 
 @Composable
 fun HomeScreen(

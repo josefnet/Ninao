@@ -1,4 +1,6 @@
-package com.costostudio.ninao.presentation.uistate
+package com.costostudio.ninao.presentation.login
+
+import com.costostudio.ninao.presentation.util.uistate.BaseScreenUiState
 
 data class LoginUiState(
     val email: String = "",
