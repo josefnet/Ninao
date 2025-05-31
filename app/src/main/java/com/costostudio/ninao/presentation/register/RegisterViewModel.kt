@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.costostudio.ninao.domain.usecase.RegisterUseCase
 import com.costostudio.ninao.domain.usecase.SaveUserToFireStoreUseCase
 import com.costostudio.ninao.presentation.util.events.AuthenticationUiEvent
+import com.costostudio.ninao.util.execute
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -71,80 +72,80 @@ class RegisterViewModel(
         val confirmPassword = _registerUiState.value.confirmPassword
 
         if (!isValidInput(firstName, lastName, email, password, confirmPassword)) {
-            val message =
-                "Vérifiez les champs : email invalide, mot de passe trop court ou non identique."
-            _registerUiState.update {
-                it.copy(
-                    baseScreenUiState = it.baseScreenUiState.copy(
-                        errorMessage = message
-                    )
-                )
+            val message = "Vérifiez les champs : email invalide, mot de passe trop court ou non identique."
+            viewModelScope.launch {
+                _registerUiEvent.emit(AuthenticationUiEvent.ShowError(message))
             }
             return
         }
 
-        viewModelScope.launch {
+        viewModelScope.execute(
+            function = {
+                updateRegisterUiState(true)
+                registerUseCase.execute(firstName, lastName, email, password)
+            },
+            onSuccess = { result ->
+                result
+                    .onSuccess {
+                        viewModelScope.execute(
+                            function = {
+                                saveUserToFireStoreUseCase.execute(
+                                    result.getOrNull()!!,
+                                    firstName,
+                                    lastName,
+                                    email
+                                )
+                            },
+                            onSuccess = { result2 ->
+                                result2
+                                    .onSuccess {
+                                        updateRegisterUiState(false)
+                                        _registerUiEvent.emit(AuthenticationUiEvent.Success)
+                                    }
+                                    .onFailure {
+                                    updateRegisterUiState(false, it.message)
+                                        _registerUiEvent.emit(AuthenticationUiEvent.ShowError(it.message ?: "Unknown error"))
+                                }
+                            },
 
-            _registerUiState.update {
-                it.copy(
-                    baseScreenUiState = it.baseScreenUiState.copy(
-                        isLoading = true,
-                        errorMessage = null
-                    )
-                )
-            }
-
-            val result = registerUseCase.execute(firstName, lastName, email, password)
-            if (result.isSuccess) {
-                _registerUiState.update {
-                    it.copy(
-                        baseScreenUiState = it.baseScreenUiState.copy(isLoading = false)
-                    )
-                }
-
-                val authResult = saveUserToFireStoreUseCase.execute(
-                    result.getOrNull()!!,
-                    firstName,
-                    lastName,
-                    email
-                )
-                if (authResult.isSuccess) {
-                    _registerUiState.update {
-                        it.copy(
-                            baseScreenUiState = it.baseScreenUiState.copy(isLoading = false)
+                            onError = {
+                                updateRegisterUiState(false, it.message)
+                                _registerUiEvent.emit(
+                                    AuthenticationUiEvent.ShowError(
+                                        it.message ?: "Unknown error"
+                                    )
+                                )
+                            }
                         )
                     }
-                    _registerUiEvent.emit(AuthenticationUiEvent.Success)
-                } else {
-                    val message = authResult.exceptionOrNull()?.message
-                        ?: "Erreur lors de l'enregistrement dans Firestore"
-                    _registerUiState.update {
-                        it.copy(
-                            baseScreenUiState = it.baseScreenUiState.copy(
-                                isLoading = false,
-                                errorMessage = message
+                    .onFailure {
+                        updateRegisterUiState(false, it.message)
+                        _registerUiEvent.emit(
+                            AuthenticationUiEvent.ShowError(
+                                it.message ?: "Unknown error"
                             )
                         )
                     }
-                    _registerUiEvent.emit(AuthenticationUiEvent.ShowError(message))
-                }
-            } else {
-                val message = result.exceptionOrNull()?.message ?: "Unknown error"
-                _registerUiState.update {
-                    it.copy(
-                        baseScreenUiState = it.baseScreenUiState.copy(
-                            isLoading = false,
-                            errorMessage = message
-                        )
-                    )
-                }
-                _registerUiEvent.emit(AuthenticationUiEvent.ShowError(message))
+            },
+            onError = {
+                updateRegisterUiState(false, it.message)
+                _registerUiEvent.emit(AuthenticationUiEvent.ShowError(it.message ?: "Unknown error"))
             }
+        )
+    }
 
+    private fun updateRegisterUiState(loadingValue: Boolean, errorMessage: String? = null) {
+        _registerUiState.update {
+            it.copy(
+                baseScreenUiState = it.baseScreenUiState.copy(
+                    isLoading = loadingValue,
+                    errorMessage = errorMessage
+                )
+            )
         }
     }
 
-    fun isValidInput(
+    private fun isValidInput(
         firstName: String,
         lastName: String,
         email: String,

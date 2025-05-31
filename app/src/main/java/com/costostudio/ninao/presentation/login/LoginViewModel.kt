@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.costostudio.ninao.domain.usecase.LoginUseCase
 import com.costostudio.ninao.presentation.util.events.AuthenticationUiEvent
+import com.costostudio.ninao.util.execute
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -48,48 +49,53 @@ class LoginViewModel(
         val password = _loginUiState.value.password
 
         if (!isValidInput(email, password)) {
-            //_loginUiState.value = LoginUiState(errorMessage = "Invalid email or password") // ca on va réinitilisé les autre valeur
-            _loginUiState.update {
-                it.copy(
-                    baseScreenUiState = it.baseScreenUiState.copy(
-                        errorMessage = "Invalid email or password"
-                    )
-                )
-            } //ca garde les autre valeur
-            return
-        }
-        viewModelScope.launch {
-            _loginUiState.update {
-                it.copy(
-                    baseScreenUiState = it.baseScreenUiState.copy(
-                        isLoading = true,
-                        errorMessage = null
-                    )
-                )
-            }
-
-            val result = loginUseCase.execute(email, password)
-            if (result.isSuccess) {
-                _loginUiState.update {
-                    it.copy(
-                        baseScreenUiState = it.baseScreenUiState.copy(isLoading = false)
-                    )
-                }
-                _loginUiEvent.emit(AuthenticationUiEvent.Success)
-            } else {
-                val message = result.exceptionOrNull()?.message ?: "Unknown error"
-                _loginUiState.update {
-                    it.copy(
-                        baseScreenUiState = it.baseScreenUiState.copy(
-                            isLoading = false,
-                            errorMessage = message
-                        )
-                    )
-                }
+            val message = "Invalid email or password"
+            updateLoginUiState(false, message)
+            viewModelScope.launch {
                 _loginUiEvent.emit(AuthenticationUiEvent.ShowError(message))
             }
+
+            return
+        }
+
+        viewModelScope.execute(
+            function = {
+                loginUseCase.execute(email, password)
+            },
+            onSuccess = { result ->
+                result
+                    .onSuccess {
+                        updateLoginUiState(false)
+                        _loginUiEvent.emit(AuthenticationUiEvent.Success)
+                    }
+                    .onFailure {
+                        updateLoginUiState(false, it.message)
+                        _loginUiEvent.emit(
+                            AuthenticationUiEvent.ShowError(
+                                it.message ?: "Unknown error"
+                            )
+                        )
+                    }
+            },
+            onError = {
+                updateLoginUiState(false, it.message)
+                _loginUiEvent.emit(AuthenticationUiEvent.ShowError(it.message ?: "Unknown error"))
+            }
+        )
+
+    }
+
+    private fun updateLoginUiState(loadingValue: Boolean, errorMessage: String? = null) {
+        _loginUiState.update {
+            it.copy(
+                baseScreenUiState = it.baseScreenUiState.copy(
+                    isLoading = loadingValue,
+                    errorMessage = errorMessage
+                )
+            )
         }
     }
+
 
     private fun isValidInput(email: String, password: String): Boolean {
         return email.isNotBlank() && Patterns.EMAIL_ADDRESS.matcher(email).matches()

@@ -48,11 +48,11 @@ fun RegisterScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.registerUiEvent.collectLatest { event ->
-            when (event) {
+        viewModel.registerUiEvent.collectLatest { uiEvent ->
+            when (uiEvent) {
                 is AuthenticationUiEvent.Success -> navigator.navigateToLogin()
                 is AuthenticationUiEvent.ShowError -> Toast.makeText(
-                    context, event.message, Toast.LENGTH_SHORT
+                    context, uiEvent.message, Toast.LENGTH_SHORT
                 ).show()
             }
         }

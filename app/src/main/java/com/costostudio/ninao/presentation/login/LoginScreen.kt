@@ -59,12 +59,12 @@ fun LoginScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.loginUiEvent.collectLatest { event ->
-            when (event) {
+        viewModel.loginUiEvent.collectLatest { uiEvent ->
+            when (uiEvent) {
                 is AuthenticationUiEvent.Success -> navigator.navigateToHome()
                 is AuthenticationUiEvent.ShowError -> Toast.makeText(
                     context,
-                    event.message,
+                    uiEvent.message,
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -73,7 +73,7 @@ fun LoginScreen(
 
     LoginScreenContent(
         loginUiState = loginUiState,
-        onEvent= viewModel::onEvent,
+        onEvent = viewModel::onEvent,
         onNavigateToRegister = navigator::navigateToRegister
     )
 }
@@ -85,82 +85,87 @@ fun LoginScreenContent(
     onNavigateToRegister: () -> Unit
 ) {
 
-        Box(
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        BackgroundApplicationImage(
+            backgroundImage = R.drawable.bg,
+            modifier = Modifier.matchParentSize()
+        )
+
+        Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(32.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            BackgroundApplicationImage(
-                backgroundImage = R.drawable.bg,
-                modifier = Modifier.matchParentSize())
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(32.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+            AppLogo(
+                backgroundImage = R.drawable.logo,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+
+            Text(
+                text = stringResource(R.string.loginScreen_login_message),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            CustomTextField(
+                value = loginUiState.email,
+                onValueChange = { onEvent(LoginEvent.EmailChanged(it)) },
+                label = stringResource(R.string.registerScreen_email),
+                leadingIcon = Icons.Default.Email,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+
+            CustomTextField(
+                value = loginUiState.password,
+                onValueChange = { onEvent(LoginEvent.PasswordChanged(it)) },
+                label = stringResource(R.string.registerScreen_password),
+                leadingIcon = Icons.Default.Lock,
+                trailingIcon = Icons.Default.Visibility,
+                isPasswordField = true,
+                isPasswordVisible = loginUiState.isPasswordVisible,
+                onTogglePasswordVisibility = { onEvent(LoginEvent.TogglePasswordVisibility) },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+
+            CustomButton(
+                text = stringResource(R.string.loginScreen_signIn),
+                onClick = { onEvent(LoginEvent.Submit) },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            ContinueWithButton(
+                buttonText = stringResource(R.string.loginScreen_signInWithGoogle),
+                id = R.drawable.google_login
             ) {
+                /* viewModel.signInWithGoogle(activity) { signInIntent ->
+                      googleSignInLauncher.launch(signInIntent) // Use the intent directly here
+                  }*/
+            }
 
-                AppLogo(
-                    backgroundImage = R.drawable.logo,
-                    modifier = Modifier.fillMaxWidth()
-                )
+            CustomTextButton(
+                text = stringResource(R.string.loginScreen_newAccount),
+                onClick = onNavigateToRegister,
+                style = MaterialTheme.typography.bodyMedium
+            )
 
-
-                Text(text = stringResource(R.string.loginScreen_login_message), fontSize = 24.sp, fontWeight = FontWeight.Bold)
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                CustomTextField(
-                    value = loginUiState.email,
-                    onValueChange = { onEvent(LoginEvent.EmailChanged(it)) },
-                    label = stringResource(R.string.registerScreen_email),
-                    leadingIcon = Icons.Default.Email,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-
-                CustomTextField(
-                    value = loginUiState.password,
-                    onValueChange = { onEvent(LoginEvent.PasswordChanged(it)) },
-                    label = stringResource(R.string.registerScreen_password),
-                    leadingIcon = Icons.Default.Lock,
-                    trailingIcon = Icons.Default.Visibility,
-                    isPasswordField = true,
-                    isPasswordVisible = loginUiState.isPasswordVisible,
-                    onTogglePasswordVisibility = { onEvent(LoginEvent.TogglePasswordVisibility) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-
-                CustomButton(
-                    text = stringResource(R.string.loginScreen_signIn),
-                    onClick = { onEvent(LoginEvent.Submit) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                ContinueWithButton(
-                    buttonText = stringResource(R.string.loginScreen_signInWithGoogle),
-                    id = R.drawable.google_login
-                ) {
-                    /* viewModel.signInWithGoogle(activity) { signInIntent ->
-                          googleSignInLauncher.launch(signInIntent) // Use the intent directly here
-                      }*/
-                }
-
-                CustomTextButton(
-                    text = stringResource(R.string.loginScreen_newAccount),
-                    onClick = onNavigateToRegister,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                if (loginUiState.baseScreenUiState.isLoading) {
-                    CustomLoading()
-                }
+            if (loginUiState.baseScreenUiState.isLoading) {
+                CustomLoading()
+            }
         }
     }
 
