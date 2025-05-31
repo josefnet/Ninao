@@ -1,4 +1,4 @@
-package com.costostudio.ninao.presentation.events
+package com.costostudio.ninao.presentation.util.events
 
 sealed class AuthenticationUiEvent {
     object Success : AuthenticationUiEvent()

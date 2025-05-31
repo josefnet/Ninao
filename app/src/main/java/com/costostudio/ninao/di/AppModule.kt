@@ -10,9 +10,9 @@ import com.costostudio.ninao.domain.usecase.RegisterUseCase
 import com.costostudio.ninao.domain.usecase.RegisterUseCaseImpl
 import com.costostudio.ninao.domain.usecase.SaveUserToFireStoreUseCase
 import com.costostudio.ninao.domain.usecase.SaveUserToFireStoreUseCaseImpl
-import com.costostudio.ninao.presentation.viewmodel.HomeViewModel
-import com.costostudio.ninao.presentation.viewmodel.LoginViewModel
-import com.costostudio.ninao.presentation.viewmodel.RegisterViewModel
+import com.costostudio.ninao.presentation.home.HomeViewModel
+import com.costostudio.ninao.presentation.login.LoginViewModel
+import com.costostudio.ninao.presentation.register.RegisterViewModel
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.FirebaseAuth

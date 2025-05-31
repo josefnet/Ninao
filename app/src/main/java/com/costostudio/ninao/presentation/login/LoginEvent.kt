@@ -1,4 +1,4 @@
-package com.costostudio.ninao.presentation.events
+package com.costostudio.ninao.presentation.login
 
 sealed class LoginEvent {
     data class EmailChanged(val email: String) : LoginEvent()

@@ -1,4 +1,4 @@
-package com.costostudio.ninao.presentation.compose
+package com.costostudio.ninao.presentation.util.compose
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator

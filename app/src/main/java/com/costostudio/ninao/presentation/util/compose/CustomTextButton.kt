@@ -1,4 +1,4 @@
-package com.costostudio.ninao.presentation.compose
+package com.costostudio.ninao.presentation.util.compose
 
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton

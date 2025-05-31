@@ -1,4 +1,4 @@
-package com.costostudio.ninao.presentation.compose
+package com.costostudio.ninao.presentation.util.compose
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth

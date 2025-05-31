@@ -1,4 +1,4 @@
-package com.costostudio.ninao.presentation.compose
+package com.costostudio.ninao.presentation.util.compose
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons

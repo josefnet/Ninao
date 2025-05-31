@@ -1,4 +1,4 @@
-package com.costostudio.ninao.presentation.events
+package com.costostudio.ninao.presentation.register
 
 sealed class RegisterEvent {
     data class FirstNameChanged(val firstName: String): RegisterEvent()
