@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.ksp)
     id("org.jetbrains.kotlin.plugin.compose") version "2.0.0"
     id("com.google.gms.google-services")
+    id("org.jlleitschuh.gradle.ktlint")
+    id("io.gitlab.arturbosch.detekt")
 }
 
 android {
@@ -53,6 +55,20 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+}
+
+detekt {
+    config.setFrom(files("$rootDir/detekt.yml"))
+    buildUponDefaultConfig = true
+    allRules = false
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    reports {
+        html.required.set(true)
+        xml.required.set(true)
+    }
 }
 
 dependencies {
@@ -75,7 +91,7 @@ dependencies {
     implementation(libs.koin.core)
     implementation(libs.koin.android)
     implementation(libs.koin.android.compose)
-   // implementation(libs.koin.androidx.viewmodel)
+    // implementation(libs.koin.androidx.viewmodel)
 
 
     // Coroutines & Flow
