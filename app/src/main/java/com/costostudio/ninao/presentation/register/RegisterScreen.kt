@@ -168,7 +168,6 @@ fun RegisterScreenContent(
             if (registerUiState.baseScreenUiState.isLoading) {
                 CustomLoading()
             }
-
         }
     }
 
