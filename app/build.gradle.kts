@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.ksp)
     id("org.jetbrains.kotlin.plugin.compose") version "2.0.0"
     id("com.google.gms.google-services")
+    id("org.jlleitschuh.gradle.ktlint")
 }
 
 android {
