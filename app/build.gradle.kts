@@ -137,8 +137,11 @@ dependencies {
     // Accompanist (for previews, theming, animations)
     implementation(libs.accompanist.systemuicontroller)
 
-// Coil (for image loading in Compose)
+    // Coil (for image loading in Compose)
     implementation(libs.coil.compose)
+
+    // SplashScreen
+    implementation(libs.androidx.core.splashscreen)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

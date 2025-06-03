@@ -13,6 +13,7 @@ import com.costostudio.ninao.domain.usecase.SaveUserToFireStoreUseCaseImpl
 import com.costostudio.ninao.presentation.home.HomeViewModel
 import com.costostudio.ninao.presentation.login.LoginViewModel
 import com.costostudio.ninao.presentation.register.RegisterViewModel
+import com.costostudio.ninao.presentation.splash.SplashViewModel
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.FirebaseAuth
@@ -41,4 +42,5 @@ val appModule = module {
     viewModel { LoginViewModel(get()) }
     viewModel { RegisterViewModel(get(),get())}
     viewModel { HomeViewModel(get()) }
+    viewModel { SplashViewModel() }
 }
