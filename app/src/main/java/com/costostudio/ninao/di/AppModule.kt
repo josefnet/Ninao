@@ -10,6 +10,7 @@ import com.costostudio.ninao.domain.usecase.RegisterUseCase
 import com.costostudio.ninao.domain.usecase.RegisterUseCaseImpl
 import com.costostudio.ninao.domain.usecase.SaveUserToFireStoreUseCase
 import com.costostudio.ninao.domain.usecase.SaveUserToFireStoreUseCaseImpl
+import com.costostudio.ninao.presentation.drawer.NavigationDrawerViewModel
 import com.costostudio.ninao.presentation.home.HomeViewModel
 import com.costostudio.ninao.presentation.login.LoginViewModel
 import com.costostudio.ninao.presentation.register.RegisterViewModel
@@ -43,4 +44,5 @@ val appModule = module {
     viewModel { RegisterViewModel(get(),get())}
     viewModel { HomeViewModel(get()) }
     viewModel { SplashViewModel() }
+    viewModel { NavigationDrawerViewModel() }
 }
