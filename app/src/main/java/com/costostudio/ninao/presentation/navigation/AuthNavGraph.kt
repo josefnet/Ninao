@@ -6,10 +6,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.costostudio.ninao.presentation.home.HomeScreen
+import com.costostudio.ninao.presentation.drawer.DrawerNavigation
 import com.costostudio.ninao.presentation.login.LoginScreen
 import com.costostudio.ninao.presentation.register.RegisterScreen
-import com.costostudio.ninao.presentation.home.HomeViewModel
 import com.costostudio.ninao.presentation.login.LoginViewModel
 import com.costostudio.ninao.presentation.register.RegisterViewModel
 import org.koin.androidx.compose.koinViewModel
@@ -18,7 +17,7 @@ import org.koin.androidx.compose.koinViewModel
 fun AuthNavGraph(
     navController: NavHostController = rememberNavController()
 ) {
-    val navigator = remember(navController) { AuthNavigatorImpl(navController) }
+    val navigator = remember(navController) { NavigatorImpl(navController) }
 
     NavHost(navController, startDestination = AppDestinations.LOGIN) {
         composable(AppDestinations.LOGIN) {
@@ -26,8 +25,7 @@ fun AuthNavGraph(
             LoginScreen(viewModel, navigator)
         }
         composable(AppDestinations.HOME) {
-            val viewModel: HomeViewModel = koinViewModel()
-            HomeScreen(viewModel, navigator)
+            DrawerNavigation()
         }
         composable(AppDestinations.REGISTER) {
             val viewModel: RegisterViewModel = koinViewModel()
