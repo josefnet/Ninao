@@ -46,14 +46,14 @@ import com.costostudio.ninao.presentation.util.compose.CustomLoading
 import com.costostudio.ninao.presentation.util.compose.CustomTextButton
 import com.costostudio.ninao.presentation.util.compose.CustomTextField
 import com.costostudio.ninao.presentation.util.events.AuthenticationUiEvent
-import com.costostudio.ninao.presentation.navigation.AuthNavigator
+import com.costostudio.ninao.presentation.navigation.Navigator
 import kotlinx.coroutines.flow.collectLatest
 
 
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel,
-    navigator: AuthNavigator
+    navigator: Navigator
 ) {
     val loginUiState by viewModel.loginUiState.collectAsState()
     val context = LocalContext.current

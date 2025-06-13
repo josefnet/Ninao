@@ -2,15 +2,15 @@ package com.costostudio.ninao.presentation.navigation
 
 import androidx.navigation.NavHostController
 
-interface AuthNavigator {
+interface Navigator {
     fun navigateToHome()
     fun navigateToLogin()
     fun navigateToRegister()
 }
 
-class AuthNavigatorImpl(
+class NavigatorImpl(
     private val navController: NavHostController
-) : AuthNavigator {
+) : Navigator {
     override fun navigateToHome() = navController.navigate(AppDestinations.HOME)
     override fun navigateToLogin() = navController.navigate(AppDestinations.LOGIN)
     override fun navigateToRegister() = navController.navigate(AppDestinations.REGISTER)
