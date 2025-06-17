@@ -1,17 +1,18 @@
 package com.costostudio.ninao.presentation.drawer
 
-import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import com.costostudio.ninao.presentation.drawer.component.DrawerContent
 import com.costostudio.ninao.presentation.home.HomeScreen
 import com.costostudio.ninao.presentation.profile.ProfileScreen
 import com.costostudio.ninao.presentation.settings.SettingsScreen
 import kotlinx.coroutines.launch
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DrawerNavigation() {
@@ -63,12 +64,15 @@ fun DrawerNavigation() {
                     )
                 )
             }
-        ) { @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-            // Affichage de l'écran selon la sélection
-            when (currentScreen) {
-                Screen.Home.route -> HomeScreen()
-                Screen.Profile.route -> ProfileScreen()
-                Screen.Settings.route -> SettingsScreen()
+        ) { paddingValues ->
+            Box(modifier = Modifier.padding(paddingValues)) {
+                // Affichage de l'écran selon la sélection
+                when (currentScreen) {
+                    Screen.Home.route -> HomeScreen()
+                    Screen.Profile.route -> ProfileScreen()
+                    Screen.Settings.route -> SettingsScreen()
+                }
+
             }
         }
     }
