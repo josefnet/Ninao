@@ -4,13 +4,18 @@ import com.costostudio.ninao.data.repository.AuthRepositoryImpl
 import com.costostudio.ninao.data.repository.UserRepositoryImpl
 import com.costostudio.ninao.domain.repository.AuthRepository
 import com.costostudio.ninao.domain.repository.UserRepository
+import com.costostudio.ninao.domain.usecase.GetUserUseCase
+import com.costostudio.ninao.domain.usecase.GetUserUseCaseImpl
 import com.costostudio.ninao.domain.usecase.LoginUseCase
 import com.costostudio.ninao.domain.usecase.LoginUseCaseImpl
 import com.costostudio.ninao.domain.usecase.RegisterUseCase
 import com.costostudio.ninao.domain.usecase.RegisterUseCaseImpl
 import com.costostudio.ninao.domain.usecase.SaveUserToFireStoreUseCase
 import com.costostudio.ninao.domain.usecase.SaveUserToFireStoreUseCaseImpl
+import com.costostudio.ninao.domain.usecase.UpdateUserToFireStoreUseCase
+import com.costostudio.ninao.domain.usecase.UpdateUserToFireStoreUseCaseImpl
 import com.costostudio.ninao.presentation.login.LoginViewModel
+import com.costostudio.ninao.presentation.profile.ProfileViewModel
 import com.costostudio.ninao.presentation.register.RegisterViewModel
 import com.costostudio.ninao.presentation.splash.SplashViewModel
 import com.google.android.gms.auth.api.identity.Identity
@@ -30,15 +35,18 @@ val appModule = module {
 
     // Repositories
     single<AuthRepository> { AuthRepositoryImpl(get()) }
-    single<UserRepository> { UserRepositoryImpl(get()) }
+    single<UserRepository> { UserRepositoryImpl(get(),get()) }
 
     // useCases
     single<LoginUseCase> { LoginUseCaseImpl(get()) }
     single<RegisterUseCase> { RegisterUseCaseImpl(get()) }
     single<SaveUserToFireStoreUseCase> { SaveUserToFireStoreUseCaseImpl(get()) }
+    single<UpdateUserToFireStoreUseCase> { UpdateUserToFireStoreUseCaseImpl(get()) }
+    single<GetUserUseCase> { GetUserUseCaseImpl(get()) }
 
     // ViewModels
+    viewModel { SplashViewModel() }
     viewModel { LoginViewModel(get()) }
     viewModel { RegisterViewModel(get(),get())}
-    viewModel { SplashViewModel() }
+    viewModel { ProfileViewModel(get(),get()) }
 }

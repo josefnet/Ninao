@@ -1,7 +1,6 @@
 package com.costostudio.ninao.data.repository
 
 import android.util.Log
-import com.costostudio.ninao.domain.model.User
 import com.costostudio.ninao.domain.repository.AuthRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
@@ -39,13 +38,6 @@ class AuthRepositoryImpl(
             Result.success(uid)
         } catch (e: Exception) {
             Result.failure(Exception(e.message ?: "Unknown error"))
-        }
-    }
-
-    override fun getCurrentUser(): User? {
-        val user = auth.currentUser
-        return user?.let {
-            User(uid = it.uid, email = it.email ?: "")
         }
     }
 
