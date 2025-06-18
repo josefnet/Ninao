@@ -32,7 +32,8 @@ fun CustomTextField(
     trailingIcon: ImageVector? = null,
     onTrailingIconClick: (() -> Unit)? = null,
     errorMessage: String? = null,
-    singleLine: Boolean = true
+    singleLine: Boolean = true,
+    enabled: Boolean = true
 ) {
     Column(modifier = modifier) {
         OutlinedTextField(
@@ -70,7 +71,8 @@ fun CustomTextField(
             },
             isError = errorMessage != null,
             singleLine = singleLine,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = enabled
         )
 
         errorMessage?.let {
