@@ -135,7 +135,7 @@ class ProfileViewModel(
             it.copy(
                 firstName = userInfo.firstName,
                 lastName = userInfo.lastName,
-                //email = it.email
+                email = userInfo.email
             )
         }
     }

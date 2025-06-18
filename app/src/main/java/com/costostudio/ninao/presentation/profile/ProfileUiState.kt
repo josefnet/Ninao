@@ -1,6 +1,5 @@
 package com.costostudio.ninao.presentation.profile
 
-import com.costostudio.ninao.presentation.util.uistate.BaseScreenUiState
 
 data class ProfileUiState(
     val firstName: String = "",
@@ -10,6 +9,7 @@ data class ProfileUiState(
     val isPasswordVisible: Boolean = false,
     val confirmPassword: String = "",
     val isConfirmPasswordVisible: Boolean = false,
+    val imageUrl: String? = null,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val isSuccess: Boolean = false

@@ -7,20 +7,22 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Abc
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.costostudio.ninao.R
 import com.costostudio.ninao.presentation.util.compose.CustomTextField
+import com.costostudio.ninao.presentation.util.compose.GenreSelectionComponent
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 
@@ -49,6 +51,7 @@ fun ProfileScreen() {
 
     ProfileScreenContent(
         profileUiState = profileUiState,
+        context = context,
         onEvent = viewModel::onEvent
     )
 
@@ -57,8 +60,10 @@ fun ProfileScreen() {
 @Composable
 fun ProfileScreenContent(
     profileUiState: ProfileUiState,
+    context: android.content.Context,
     onEvent: (ProfileUiEvent) -> Unit,
 ) {
+    var selectedGender by remember { mutableStateOf("Homme") }
 
     Column(
         modifier = Modifier
@@ -76,6 +81,7 @@ fun ProfileScreenContent(
         Spacer(modifier = Modifier.height(32.dp))
 
         // Avatar
+
         Box(
             modifier = Modifier
                 .size(120.dp)
@@ -83,11 +89,18 @@ fun ProfileScreenContent(
                 .background(MaterialTheme.colorScheme.primary),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = profileUiState.firstName + " " + profileUiState.lastName.capitalize(),
-                color = Color.White,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold
+            AsyncImage(
+                model = ImageRequest.Builder(context)
+                    .data(profileUiState.imageUrl)
+                    .fallback(R.drawable.outline_account_circle_24)   // utilisé si imageUrl est null
+                    .error(R.drawable.outline_account_circle_24)      // utilisé si chargement échoue
+                    .placeholder(R.drawable.outline_account_circle_24) // pendant le chargement
+                    .build(),
+                contentDescription = "Avatar",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(CircleShape)
             )
         }
 
@@ -102,6 +115,11 @@ fun ProfileScreenContent(
             Column(
                 modifier = Modifier.padding(20.dp)
             ) {
+
+                GenreSelectionComponent(
+                    selectedGender = selectedGender,
+                    onGenderSelected = { selectedGender = it }
+                )
 
                 CustomTextField(
                     value = profileUiState.firstName,
@@ -123,6 +141,17 @@ fun ProfileScreenContent(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                CustomTextField(
+                    value = profileUiState.email,
+                    onValueChange = { onEvent(ProfileUiEvent.EmailChanged(it)) },
+                    label = stringResource(R.string.registerScreen_email),
+                    leadingIcon = Icons.Default.Email,
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = false
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Button(
                     onClick = { onEvent(ProfileUiEvent.SaveModification) },
                     modifier = Modifier.fillMaxWidth()
@@ -139,6 +168,7 @@ fun ProfileScreenContent(
 fun ProfileScreenPreview() {
     ProfileScreenContent(
         profileUiState = ProfileUiState(),
+        context = LocalContext.current,
         onEvent = {}
     )
 }
