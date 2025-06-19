@@ -7,6 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.costostudio.ninao.domain.model.UserInfo
 import com.costostudio.ninao.domain.usecase.GetUserUseCase
 import com.costostudio.ninao.domain.usecase.UpdateUserToFireStoreUseCase
+import com.costostudio.ninao.domain.usecase.image.CaptureImageFromCameraUseCase
+import com.costostudio.ninao.domain.usecase.image.SelectImageFromGalleryUseCase
+import com.costostudio.ninao.domain.util.CustomResource
 import com.costostudio.ninao.util.execute
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,6 +19,8 @@ import kotlinx.coroutines.launch
 class ProfileViewModel(
     private val getUserUseCase: GetUserUseCase,
     private val updateUserToFireStoreUseCase: UpdateUserToFireStoreUseCase,
+    private val selectImageFromGalleryUseCase: SelectImageFromGalleryUseCase,
+    private val captureImageFromCameraUseCase: CaptureImageFromCameraUseCase
 ) : ViewModel() {
 
     private val _profileUiState = MutableStateFlow(ProfileUiState())
@@ -31,7 +36,7 @@ class ProfileViewModel(
                 result
                     .onSuccess { userInfo ->
                         getUserInfos(userInfo)
-                       // _profileUiState.update { it.copy(isSuccess = true) }
+                        // _profileUiState.update { it.copy(isSuccess = true) }
                     }
                     .onFailure {
                         updateProfileUiState(false, it.message)
@@ -79,6 +84,54 @@ class ProfileViewModel(
 
             ProfileUiEvent.ClearError -> _profileUiState.update { it.copy(errorMessage = null) }
             ProfileUiEvent.ClearSuccess -> _profileUiState.update { it.copy(isSuccess = false) }
+
+            ProfileUiEvent.Image.OnImageClicked -> {
+                _profileUiState.update {
+                    it.copy(
+                        imageUiState = it.imageUiState.copy(
+                            showImageSourceDialog = true
+                        )
+                    )
+                }
+            }
+
+            ProfileUiEvent.Image.OnImageSourceDialogDismissed -> {
+                _profileUiState.update {
+                    it.copy(
+                        imageUiState = it.imageUiState.copy(
+                            showImageSourceDialog = false
+                        )
+                    )
+                }
+            }
+
+            ProfileUiEvent.Image.OnGallerySelected -> {
+                _profileUiState.update {
+                    it.copy(
+                        imageUiState = it.imageUiState.copy(
+                            showImageSourceDialog = false
+                        )
+                    )
+                }
+            }
+
+            ProfileUiEvent.Image.OnCameraSelected -> {
+                _profileUiState.update {
+                    it.copy(
+                        imageUiState = it.imageUiState.copy(
+                            showImageSourceDialog = false
+                        )
+                    )
+                }
+            }
+
+            is ProfileUiEvent.Image.OnImageSelected -> {
+                handleImageSelection(event.uri)
+            }
+
+            is ProfileUiEvent.Image.OnImageCaptured -> {
+                handleImageCapture(event.uri)
+            }
         }
     }
 
@@ -121,7 +174,7 @@ class ProfileViewModel(
                     }
             },
             onError = {
-                 _profileUiState.update { it.copy(errorMessage = "Unknowing error") }
+                _profileUiState.update { it.copy(errorMessage = "Unknowing error") }
             }
         )
     }
@@ -130,7 +183,7 @@ class ProfileViewModel(
         _profileUiState.update { it.copy(isLoading = loadingValue, errorMessage = errorMessage) }
     }
 
-    private fun getUserInfos(userInfo: UserInfo){
+    private fun getUserInfos(userInfo: UserInfo) {
         _profileUiState.update {
             it.copy(
                 firstName = userInfo.firstName,
@@ -156,6 +209,90 @@ class ProfileViewModel(
                 && Patterns.EMAIL_ADDRESS.matcher(email).matches()
                 && password.length >= 6
                 && password == confirmPassword
+    }
+
+    private fun handleImageSelection(uri: android.net.Uri) {
+        viewModelScope.launch {
+            selectImageFromGalleryUseCase(uri).collect { resource ->
+                when (resource) {
+                    is CustomResource.Loading -> {
+                        _profileUiState.update {
+                            it.copy(
+                                imageUiState = it.imageUiState.copy(
+                                    isLoading = true, error = null
+                                )
+                            )
+                        }
+                    }
+
+                    is CustomResource.Success -> {
+                        _profileUiState.update {
+                            it.copy(
+                                imageUiState = it.imageUiState.copy(
+                                    imageUrl = resource.data,
+                                    isLoading = false,
+                                    error = null
+                                )
+                            )
+                        }
+                    }
+
+                    is CustomResource.Error -> {
+                        _profileUiState.update {
+                            it.copy(
+                                imageUiState = it.imageUiState.copy(
+                                    isLoading = false,
+                                    error = resource.message
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun handleImageCapture(uri: android.net.Uri) {
+        viewModelScope.launch {
+            captureImageFromCameraUseCase(uri).collect { resource ->
+                when (resource) {
+                    is CustomResource.Loading -> {
+                        _profileUiState.update {
+                            it.copy(
+                                imageUiState = it.imageUiState.copy(
+                                    isLoading = true,
+                                    error = null
+                                )
+                            )
+                        }
+
+                    }
+
+                    is CustomResource.Success -> {
+                        _profileUiState.update {
+                            it.copy(
+                                imageUiState = it.imageUiState.copy(
+                                    imageUrl = resource.data,
+                                    isLoading = false,
+                                    error = null
+                                )
+                            )
+                        }
+                    }
+
+                    is CustomResource.Error -> {
+                        _profileUiState.update {
+                            it.copy(
+                                imageUiState = it.imageUiState.copy(
+                                    isLoading = false,
+                                    error = resource.message
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 
 }

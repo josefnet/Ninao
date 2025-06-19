@@ -2,8 +2,10 @@ package com.costostudio.ninao.di
 
 import com.costostudio.ninao.data.repository.AuthRepositoryImpl
 import com.costostudio.ninao.data.repository.UserRepositoryImpl
+import com.costostudio.ninao.data.repository.image.ImageRepositoryImpl
 import com.costostudio.ninao.domain.repository.AuthRepository
 import com.costostudio.ninao.domain.repository.UserRepository
+import com.costostudio.ninao.domain.repository.image.ImageRepository
 import com.costostudio.ninao.domain.usecase.GetUserUseCase
 import com.costostudio.ninao.domain.usecase.GetUserUseCaseImpl
 import com.costostudio.ninao.domain.usecase.LoginUseCase
@@ -14,6 +16,8 @@ import com.costostudio.ninao.domain.usecase.SaveUserToFireStoreUseCase
 import com.costostudio.ninao.domain.usecase.SaveUserToFireStoreUseCaseImpl
 import com.costostudio.ninao.domain.usecase.UpdateUserToFireStoreUseCase
 import com.costostudio.ninao.domain.usecase.UpdateUserToFireStoreUseCaseImpl
+import com.costostudio.ninao.domain.usecase.image.CaptureImageFromCameraUseCase
+import com.costostudio.ninao.domain.usecase.image.SelectImageFromGalleryUseCase
 import com.costostudio.ninao.presentation.login.LoginViewModel
 import com.costostudio.ninao.presentation.profile.ProfileViewModel
 import com.costostudio.ninao.presentation.register.RegisterViewModel
@@ -36,6 +40,7 @@ val appModule = module {
     // Repositories
     single<AuthRepository> { AuthRepositoryImpl(get()) }
     single<UserRepository> { UserRepositoryImpl(get(),get()) }
+    single<ImageRepository> { ImageRepositoryImpl(androidContext()) }
 
     // useCases
     single<LoginUseCase> { LoginUseCaseImpl(get()) }
@@ -43,10 +48,12 @@ val appModule = module {
     single<SaveUserToFireStoreUseCase> { SaveUserToFireStoreUseCaseImpl(get()) }
     single<UpdateUserToFireStoreUseCase> { UpdateUserToFireStoreUseCaseImpl(get()) }
     single<GetUserUseCase> { GetUserUseCaseImpl(get()) }
+    factory { SelectImageFromGalleryUseCase(get()) }
+    factory { CaptureImageFromCameraUseCase(get()) }
 
     // ViewModels
     viewModel { SplashViewModel() }
     viewModel { LoginViewModel(get()) }
     viewModel { RegisterViewModel(get(),get())}
-    viewModel { ProfileViewModel(get(),get()) }
+    viewModel { ProfileViewModel(get(),get(),get(),get()) }
 }
