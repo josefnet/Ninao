@@ -34,14 +34,16 @@ class UserRepositoryImpl(
         uid: String,
         firstName: String,
         lastName: String,
-        email: String
+        email: String,
+        genre: Int
     ): Result<Boolean> {
         return try {
             val userUpdate = hashMapOf<String, Any>(
                 "id" to uid,
                 "firstName" to firstName,
                 "lastName" to lastName,
-                "email" to email
+                "email" to email,
+                "genre" to genre
             )
             firestore.collection("users").document(uid).update(userUpdate).await()
             Result.success(true)

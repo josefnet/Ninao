@@ -15,6 +15,9 @@ sealed class ProfileUiEvent {
     object TogglePasswordVisibility : ProfileUiEvent()
     object ToggleConfirmPasswordVisibility : ProfileUiEvent()
 
+    // Gender selection
+    data class GenderSelected(val gender: Int) : ProfileUiEvent()
+
     // Save, clear actions
     object SaveModification : ProfileUiEvent()
     object ClearError : ProfileUiEvent()

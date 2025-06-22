@@ -20,10 +20,10 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun GenreSelectionComponent(
-    selectedGender: String,
-    onGenderSelected: (String) -> Unit
+    selectedGender: Int,
+    onGenderSelected: (Int) -> Unit
 ) {
-    val options = listOf("Homme", "Femme")
+    val options = listOf(0,1)
 
     Column {
         Text("Genre", style = MaterialTheme.typography.titleMedium)
@@ -39,25 +39,34 @@ fun GenreSelectionComponent(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .clickable { onGenderSelected(gender) }
-                        .padding(8.dp)
+                        .padding(0.dp)
                 ) {
                     RadioButton(
                         selected = gender == selectedGender,
                         onClick = { onGenderSelected(gender) }
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = gender)
+                    Text(text = if (gender == 0) "Homme" else "Femme")
                 }
             }
         }
     }
 }
 
-@Preview
+@Preview(name = "GenreSelectionComponentHomme", showBackground = true)
 @Composable
-fun GenreSelectionComponentPreview() {
+fun GenreSelectionComponentMalePreview() {
     GenreSelectionComponent(
-        selectedGender = "Homme",
+        selectedGender = 0,
+        onGenderSelected = {}
+    )
+}
+
+@Preview(name = "GenreSelectionComponentFemme", showBackground = true)
+@Composable
+fun GenreSelectionComponentFemalePreview() {
+    GenreSelectionComponent(
+        selectedGender = 1,
         onGenderSelected = {}
     )
 }
