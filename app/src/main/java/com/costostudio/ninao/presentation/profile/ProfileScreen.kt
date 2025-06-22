@@ -153,17 +153,17 @@ fun ProfileScreenContent(
     onCameraClick: () -> Unit,
     onEvent: (ProfileUiEvent) -> Unit,
 ) {
-    var selectedGender by remember { mutableStateOf("Homme") }
+   // var selectedGender by remember { mutableIntStateOf(profileUiState.genre) }
 
-    Scaffold(
+    /*Scaffold(
         snackbarHost = { SnackbarHost(snackBarHostState) }
-    ) { paddingValues ->
+    ) { paddingValues ->*/
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
-                .padding(paddingValues),
+                .padding(16.dp),
+                //.padding(paddingValues),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -225,8 +225,8 @@ fun ProfileScreenContent(
                 ) {
 
                     GenreSelectionComponent(
-                        selectedGender = selectedGender,
-                        onGenderSelected = { selectedGender = it }
+                        selectedGender = profileUiState.genre,
+                        onGenderSelected = { onEvent(ProfileUiEvent.GenderSelected(it)) }
                     )
 
                     CustomTextField(
@@ -269,21 +269,12 @@ fun ProfileScreenContent(
                 }
             }
         }
-    }
+    //}
 }
 
 @Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview() {
-    val context = LocalContext.current
-
-    // Simuler un launcher de caméra avec callback vide
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture()
-    ) { success ->
-        // Ne rien faire pour la preview
-    }
-
     // Simuler un launcher de galerie avec callback vide
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()

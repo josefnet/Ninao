@@ -36,7 +36,6 @@ class ProfileViewModel(
                 result
                     .onSuccess { userInfo ->
                         getUserInfos(userInfo)
-                        // _profileUiState.update { it.copy(isSuccess = true) }
                     }
                     .onFailure {
                         updateProfileUiState(false, it.message)
@@ -60,6 +59,10 @@ class ProfileViewModel(
 
             is ProfileUiEvent.EmailChanged -> {
                 _profileUiState.update { it.copy(email = event.email) }
+            }
+
+            is ProfileUiEvent.GenderSelected -> {
+                _profileUiState.update { it.copy(genre = event.gender) }
             }
 
             is ProfileUiEvent.PasswordChanged -> {
@@ -137,13 +140,15 @@ class ProfileViewModel(
 
     private fun saveModification() {
 
+        val id = _profileUiState.value.id
         val firstName = _profileUiState.value.firstName
         val lastName = _profileUiState.value.lastName
         val email = _profileUiState.value.email
-        val password = _profileUiState.value.password
-        val confirmPassword = _profileUiState.value.confirmPassword
+        val genre = _profileUiState.value.genre
+      //  val password = _profileUiState.value.password
+      //  val confirmPassword = _profileUiState.value.confirmPassword
 
-        if (!isValidInput(firstName, lastName, email, password, confirmPassword)) {
+        if (!isValidInput(firstName, lastName, email)) {
             val message =
                 "Vérifiez les champs : email invalide, mot de passe trop court ou non identique."
             viewModelScope.launch {
@@ -155,12 +160,12 @@ class ProfileViewModel(
         viewModelScope.execute(
             function = {
                 updateProfileUiState(true)
-                //val uid = firebaseAuth.currentUser?.uid
                 updateUserToFireStoreUseCase.execute(
-                    "uid.toString()",
+                    id,
                     firstName,
                     lastName,
-                    email
+                    email,
+                    genre
                 )
             },
             onSuccess = { result ->
@@ -186,9 +191,11 @@ class ProfileViewModel(
     private fun getUserInfos(userInfo: UserInfo) {
         _profileUiState.update {
             it.copy(
+                id = userInfo.id,
                 firstName = userInfo.firstName,
                 lastName = userInfo.lastName,
-                email = userInfo.email
+                email = userInfo.email,
+                genre = userInfo.genre,
             )
         }
     }
@@ -198,17 +205,17 @@ class ProfileViewModel(
         firstName: String,
         lastName: String,
         email: String,
-        password: String,
-        confirmPassword: String
+       /* password: String,
+        confirmPassword: String*/
     ): Boolean {
         return firstName.isNotBlank()
                 && lastName.isNotBlank()
                 && email.isNotBlank()
-                && password.isNotBlank()
+                /*&& password.isNotBlank()
                 && confirmPassword.isNotBlank()
                 && Patterns.EMAIL_ADDRESS.matcher(email).matches()
                 && password.length >= 6
-                && password == confirmPassword
+                && password == confirmPassword*/
     }
 
     private fun handleImageSelection(uri: android.net.Uri) {

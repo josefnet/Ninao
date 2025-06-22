@@ -2,9 +2,11 @@ package com.costostudio.ninao.presentation.profile
 
 
 data class ProfileUiState(
+    val id: String = "",
     val firstName: String = "",
     val lastName: String = "",
     val email: String = "",
+    var genre: Int = 0,
     val password: String = "",
     val isPasswordVisible: Boolean = false,
     val confirmPassword: String = "",
