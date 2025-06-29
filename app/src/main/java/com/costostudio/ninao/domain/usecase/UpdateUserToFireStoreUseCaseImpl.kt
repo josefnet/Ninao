@@ -10,8 +10,9 @@ class UpdateUserToFireStoreUseCaseImpl(
         firstName: String,
         lastName: String,
         email: String,
-        genre: Int
+        genre: Int,
+        imageUrl: String?
     ): Result<Boolean> {
-        return userRepository.updateUser(uid, firstName, lastName, email, genre)
+        return userRepository.updateUser(uid, firstName, lastName, email, genre, imageUrl)
     }
 }

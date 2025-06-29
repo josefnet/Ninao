@@ -126,6 +126,7 @@ dependencies {
 
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.storage.ktx)
 
     //services google
     implementation(libs.play.services.measurement.api)

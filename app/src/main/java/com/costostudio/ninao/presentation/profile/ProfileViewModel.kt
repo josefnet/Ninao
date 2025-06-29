@@ -1,7 +1,6 @@
 package com.costostudio.ninao.presentation.profile
 
 import android.util.Log
-import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.costostudio.ninao.domain.model.UserInfo
@@ -145,8 +144,10 @@ class ProfileViewModel(
         val lastName = _profileUiState.value.lastName
         val email = _profileUiState.value.email
         val genre = _profileUiState.value.genre
-      //  val password = _profileUiState.value.password
-      //  val confirmPassword = _profileUiState.value.confirmPassword
+        val imageUrl = _profileUiState.value.imageUiState.imageUrl
+
+        //  val password = _profileUiState.value.password
+        //  val confirmPassword = _profileUiState.value.confirmPassword
 
         if (!isValidInput(firstName, lastName, email)) {
             val message =
@@ -165,7 +166,8 @@ class ProfileViewModel(
                     firstName,
                     lastName,
                     email,
-                    genre
+                    genre,
+                    imageUrl
                 )
             },
             onSuccess = { result ->
@@ -196,6 +198,7 @@ class ProfileViewModel(
                 lastName = userInfo.lastName,
                 email = userInfo.email,
                 genre = userInfo.genre,
+                imageUiState = it.imageUiState.copy(imageUrl = userInfo.imageUrl)
             )
         }
     }
@@ -205,17 +208,17 @@ class ProfileViewModel(
         firstName: String,
         lastName: String,
         email: String,
-       /* password: String,
-        confirmPassword: String*/
+        /* password: String,
+         confirmPassword: String*/
     ): Boolean {
         return firstName.isNotBlank()
                 && lastName.isNotBlank()
                 && email.isNotBlank()
-                /*&& password.isNotBlank()
-                && confirmPassword.isNotBlank()
-                && Patterns.EMAIL_ADDRESS.matcher(email).matches()
-                && password.length >= 6
-                && password == confirmPassword*/
+        /*&& password.isNotBlank()
+        && confirmPassword.isNotBlank()
+        && Patterns.EMAIL_ADDRESS.matcher(email).matches()
+        && password.length >= 6
+        && password == confirmPassword*/
     }
 
     private fun handleImageSelection(uri: android.net.Uri) {
