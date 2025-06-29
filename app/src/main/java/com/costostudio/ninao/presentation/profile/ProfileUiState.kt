@@ -15,7 +15,6 @@ data class ProfileUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val isSuccess: Boolean = false
-    /*val baseScreenUiState: BaseScreenUiState = BaseScreenUiState()*/
 )
 
 data class ImageUiState(

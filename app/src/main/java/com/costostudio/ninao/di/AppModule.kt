@@ -26,6 +26,7 @@ import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -34,13 +35,14 @@ val appModule = module {
 
     single { FirebaseAuth.getInstance() }
     single { FirebaseFirestore.getInstance() }
+    single { FirebaseStorage.getInstance() }
 
     single<SignInClient> { Identity.getSignInClient(androidContext()) }
 
     // Repositories
     single<AuthRepository> { AuthRepositoryImpl(get()) }
     single<UserRepository> { UserRepositoryImpl(get(),get()) }
-    single<ImageRepository> { ImageRepositoryImpl(androidContext()) }
+    single<ImageRepository> { ImageRepositoryImpl(androidContext(),get(),get()) }
 
     // useCases
     single<LoginUseCase> { LoginUseCaseImpl(get()) }

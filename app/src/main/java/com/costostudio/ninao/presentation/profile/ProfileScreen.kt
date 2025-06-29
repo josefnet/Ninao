@@ -197,7 +197,7 @@ fun ProfileScreenContent(
                 }
             }
 
-            // Image source dialog
+            // Image source dialog box to select image from gallery or from camera
             if (profileUiState.imageUiState.showImageSourceDialog) {
                 ImageSourceDialog(
                     onDismiss = { onEvent(ProfileUiEvent.Image.OnImageSourceDialogDismissed) },
