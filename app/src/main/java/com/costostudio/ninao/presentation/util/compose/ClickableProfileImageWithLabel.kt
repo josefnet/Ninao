@@ -26,6 +26,7 @@ import com.costostudio.ninao.R
 @Composable
 fun ClickableProfileImageWithLabel(
     imageUrl: String?,
+    clickable: Boolean = true,
     onClick: () -> Unit
 ) {
     Box(
@@ -46,21 +47,25 @@ fun ClickableProfileImageWithLabel(
             contentScale = ContentScale.Crop,
             modifier = Modifier.matchParentSize()
         )
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Black.copy(alpha = 0.4f))
-                .padding(4.dp)
-        ) {
-            Text(
-                text = "Edit Photo",
-                color = Color.White,
-                fontSize = 12.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
+        clickable.let {
+            if (it) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.Black.copy(alpha = 0.4f))
+                        .padding(4.dp)
+                ) {
+                    Text(
+                        text = "Edit Photo",
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
         }
+
     }
 }
 
