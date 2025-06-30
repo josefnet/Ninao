@@ -12,9 +12,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.costostudio.ninao.presentation.drawer.Screen
 import com.costostudio.ninao.presentation.drawer.drawerScreens
+import com.costostudio.ninao.presentation.profile.ProfileUiState
+import com.costostudio.ninao.presentation.profile.ProfileViewModel
+import com.costostudio.ninao.presentation.util.compose.ClickableProfileImageWithLabel
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun DrawerContent(
@@ -22,6 +25,8 @@ fun DrawerContent(
     onScreenSelected: (Screen) -> Unit,
     onCloseDrawer: () -> Unit
 ) {
+    val viewModel: ProfileViewModel = koinViewModel()
+    val profileUiState by viewModel.profileUiState.collectAsState()
     ModalDrawerSheet(
         modifier = Modifier.width(280.dp)
     ) {
@@ -31,7 +36,7 @@ fun DrawerContent(
                 .padding(16.dp)
         ) {
             // Header avec Logo
-            DrawerHeader()
+            DrawerHeader(profileUiState = profileUiState)
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -51,8 +56,11 @@ fun DrawerContent(
     }
 }
 
+
 @Composable
-private fun DrawerHeader() {
+private fun DrawerHeader(
+    profileUiState: ProfileUiState
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -67,12 +75,16 @@ private fun DrawerHeader() {
                 .background(MaterialTheme.colorScheme.primary),
             contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = "LOGO",
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
+            ClickableProfileImageWithLabel(
+                imageUrl = profileUiState.imageUiState.imageUrl,
+                clickable = false,
+                onClick = {}
             )
+            if (profileUiState.imageUiState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.padding(top = 16.dp)
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
